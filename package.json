@@ -5,12 +5,23 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine --config=jasmine.json"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trwolfe13/5e-combat-simulator.git"
+  },
+  "author": "Thomas R. Wolfe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/trwolfe13/5e-combat-simulator/issues"
+  },
+  "homepage": "https://github.com/trwolfe13/5e-combat-simulator#readme",
   "dependencies": {
     "lodash": "^4.17.11",
     "random-js": "^1.0.8"
+  },
+  "devDependencies": {
+    "jasmine": "^3.2.0"
   }
 }
