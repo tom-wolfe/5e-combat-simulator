@@ -1,17 +1,24 @@
 import * as _ from 'lodash';
+import { Dice, RandomProvider } from 'dice-typescript';
 
-import { DiceRoll } from './dice';
-import { EncounterCreature, Creature, CreatureType } from './models/creature';
+import { Creature, CreatureType, EncounterCreature } from './models/creature';
 import { EncounterResult } from './models/encounter';
 
 export class Encounter {
-  constructor(private dice: DiceRoll) { }
+  private dice: Dice;
+  constructor(provider?: RandomProvider) {
+    this.dice = new Dice(null, provider)
+  }
+
+  roll(input: string) {
+    return this.dice.roll(input).total;
+  }
 
   begin(creatures: Creature[]): EncounterCreature[] {
     const output: EncounterCreature[] = creatures.map(c => _.merge({}, c, { hp: 0, initiative: 0 }));
     output.forEach(c => {
       c.hp = c.maxHp;
-      c.initiative = this.dice('1d20') + c.initiativeBonus;
+      c.initiative = this.roll('1d20') + c.initiativeBonus;
     });
     return output;
   }
@@ -34,16 +41,21 @@ export class Encounter {
   }
 
   toHit(creature: EncounterCreature, target: EncounterCreature): boolean {
-    return this.dice('1d20') + creature.toHit >= target.ac;
+    return this.roll('1d20') + creature.toHit >= target.ac;
   }
 
-  damage(creature: EncounterCreature, target: EncounterCreature) {
-    target.hp -= this.dice(creature.damage);
+  calculateDamage(creature: EncounterCreature) {
+    return this.roll(creature.damage);
+  }
+
+  dealDamage(creature: EncounterCreature, damage: number) {
+    creature.hp -= damage;
   }
 
   attack(creature: EncounterCreature, target: EncounterCreature) {
     if (!this.toHit(creature, target)) { return; }
-    this.damage(target, creature);
+    const damage = this.calculateDamage(creature);
+    this.dealDamage(target, damage);
   }
 
   turn(creature: EncounterCreature, creatures: EncounterCreature[]) {
@@ -66,7 +78,7 @@ export class Encounter {
     }
     return {
       winner,
-      survivors: round.map(c => c.name)
+      survivors: round.filter(c => c.hp > 0).map(c => c.name)
     };
   }
 }

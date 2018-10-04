@@ -1,5 +1,3 @@
-import { DiceRoll } from '../dice';
-
 export type CreatureType = 'player' | 'monster';
 
 export interface Creature {

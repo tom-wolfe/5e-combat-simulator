@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/trwolfe13/5e-combat-simulator#readme",
   "dependencies": {
+    "dice-typescript": "^1.5.0",
     "lodash": "^4.17.11",
     "random-js": "^1.0.8"
   },

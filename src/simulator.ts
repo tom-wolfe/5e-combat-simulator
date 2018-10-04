@@ -1,11 +1,10 @@
-import { roll } from './dice';
 import { Encounter } from './encounter';
 import { Creature } from './models/creature';
 import { SimulationResult } from './models/simulation';
 
 export class Simulator {
   simulate(creatures: Creature[], battles: number): SimulationResult {
-    const encounter = new Encounter(roll);
+    const encounter = new Encounter();
     const simulationResult: SimulationResult = {
       battles,
       wins: { monster: 0, player: 0 },

@@ -1,10 +1,15 @@
-import { DiceRoll } from '../../src/dice';
+import { RandomProvider } from 'dice-typescript';
 
-export function constant(roll: number): DiceRoll {
-  return _ => roll;
+export class ConstantProvider implements RandomProvider {
+  constructor(private number: number) { }
+  numberBetween(min: number, max: number): number {
+    return this.number;
+  }
 }
 
-export function sequential(...rolls: number[]): DiceRoll {
-  const r = [...rolls];
-  return _ => r.splice(0, 1)[0];
+export class SequentialProvider implements RandomProvider {
+  constructor(private rolls: number[]) { }
+  numberBetween(min: number, max: number): number {
+    return this.rolls.splice(0, 1)[0];
+  }
 }
