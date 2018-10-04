@@ -1,5 +1,6 @@
 import { Creature, EncounterCreature } from '@sim/models/creature';
 import { Encounter } from '@sim/simulation/encounter';
+import * as Target from '@sim/simulation/target';
 
 import * as Dice from './utils/dice';
 
@@ -37,6 +38,7 @@ describe('encounter', () => {
         { name: '', type: 'monster', ac: 14, toHit: 6, damage: null, hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2 },
       ];
       const encounter = new Encounter(new Dice.ConstantProvider(5));
+      encounter.targetStrategy = Target.first;
       const output = encounter.target(creatures[0], creatures);
       expect(output).toBe(creatures[1]);
     });
@@ -47,6 +49,7 @@ describe('encounter', () => {
         { name: '', type: 'monster', ac: 14, toHit: 6, damage: null, hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2 },
       ];
       const encounter = new Encounter(new Dice.ConstantProvider(5));
+      encounter.targetStrategy = Target.first;
       const output = encounter.target(creatures[0], creatures);
       expect(output).toBe(creatures[2]);
     });

@@ -1,16 +1,28 @@
 import { Creature, CreatureType, EncounterCreature } from '@sim/models/creature';
-import { Hit } from '@sim/models/damage';
+import { CriticalStrategy } from '@sim/models/critical';
+import { DamageRoll, Hit } from '@sim/models/damage';
 import { EncounterResult } from '@sim/models/encounter';
+import { TargetStrategy } from '@sim/models/target';
 import { Dice, RandomProvider } from 'dice-typescript';
 import * as _ from 'lodash';
 
+import * as Critical from './critical';
+import * as Target from './target';
+
 export class Encounter {
   private dice: Dice;
+  criticalStrategy: CriticalStrategy = Critical.rollTwice;
+  targetStrategy: TargetStrategy = Target.random;
+
   constructor(provider?: RandomProvider) {
-    this.dice = new Dice(null, provider)
+    this.dice = new Dice(null, provider);
   }
 
-  roll(input: string) {
+  critical(damage: DamageRoll): number {
+    return this.criticalStrategy(this.roll.bind(this), damage);
+  }
+
+  roll(input: string): number {
     return this.dice.roll(input).total;
   }
 
@@ -35,9 +47,9 @@ export class Encounter {
     });
   }
 
-  target(creature: Creature, creatures: EncounterCreature[]): EncounterCreature {
-    const targets = creatures.filter(c => c.type !== creature.type && c.hp > 0);
-    return targets[0];
+  target(creature: EncounterCreature, creatures: EncounterCreature[]): EncounterCreature {
+    const targets = creatures.filter(c => c.hp > 0 && c.type !== creature.type);
+    return this.targetStrategy(targets);
   }
 
   toHit(creature: EncounterCreature, target: EncounterCreature): Hit {
@@ -47,12 +59,11 @@ export class Encounter {
   }
 
   calculateDamage(creature: EncounterCreature, hit: Hit): number {
-    if (hit === 'miss') { return 0; }
-    let total = this.roll(creature.damage.dice) + creature.damage.mod;
-    if (hit === 'crit') {
-      total += this.roll(creature.damage.dice);
+    switch (hit) {
+      case 'miss': return 0;
+      case 'hit': return this.roll(creature.damage.dice) + creature.damage.mod;
+      case 'crit': return this.critical(creature.damage);
     }
-    return total;
   }
 
   dealDamage(creature: EncounterCreature, damage: number) {
