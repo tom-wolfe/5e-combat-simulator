@@ -1,7 +1,5 @@
 import { Creature } from './models/creature';
-
-import { roll } from './dice';
-import { Encounter } from './encounter';
+import { Simulator } from './simulator';
 
 const creatures: Creature[] = [
   { name: 'D\'artagnan', type: 'player', ac: 16, toHit: 8, damage: d => d('2d8') + 4, maxHp: 26, initiativeBonus: -1 },
@@ -13,25 +11,14 @@ const creatures: Creature[] = [
   { name: '???', type: 'monster', ac: 16, toHit: 8, damage: d => d('1d8') + d('8d6') + 8, maxHp: 144, initiativeBonus: 4 },
 ];
 
-const winners = {
-  monster: 0,
-  player: 0,
-  survivors: {}
-}
+const simulator = new Simulator();
 
-const encounter = new Encounter(roll);
 const battles = 1000;
-for (let x = 0; x < battles; x++) {
-  const result = encounter.run(creatures);
-  winners[result.winner]++;
-  result.survivors.forEach(s => {
-    winners.survivors[s] = (winners.survivors[s] || 0) + 1;
-  });
-}
+const result = simulator.simulate(creatures, 1000);
 
-const success = winners.player / battles * 100;
-console.log(`Players have a ${success.toFixed(2)}% chance of success.\n`);
-Object.keys(winners.survivors).forEach(s => {
-  const n = winners.survivors[s] / battles * 100;
+const success = result.wins.player / battles * 100;
+console.log(`Players have a ${success.toFixed(2)}% chance of success.`);
+Object.keys(result.survivors).forEach(s => {
+  const n = result.survivors[s] / battles * 100;
   console.log(`${s} has a ${n.toFixed(2)}% chance of surviving.`);
 })
