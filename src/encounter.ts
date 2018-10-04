@@ -1,45 +1,49 @@
-const _ = require('lodash');
+import * as _ from 'lodash';
+
+import { DiceFunction } from './dice';
 
 const LOG = false;
 
-module.exports = function(dice) {
+export class Encounter {
 
-  function initiative(creatures) {
-    let rolled = creatures.map(c => ({ ...c, initiative: dice('1d20') + c.initiativeBonus }));
+  constructor(private dice: DiceFunction) { }
+
+  initiative(creatures) {
+    let rolled = creatures.map(c => ({ ...c, initiative: this.dice('1d20') + c.initiativeBonus }));
     rolled = _.orderBy(rolled, c => c.initiative, 'desc');
     if (LOG) { console.log('Initiative: ', rolled.map(c => `${c.initiative}: ${c.name}`).join(', ')); }
     return rolled;
   }
 
-  function round(creatures) {
+  round(creatures) {
     const players = creatures.filter(c => c.type === 'player');
     const monsters = creatures.filter(c => c.type === 'monster');
     _.orderBy(creatures, c => c.initiative, 'desc').forEach(c => {
       if (c.hp > 0) {
-        turn(c, c.type === 'monster' ? players : monsters);
+        this.turn(c, c.type === 'monster' ? players : monsters);
       }
     });
     return [...players, ...monsters];
   }
-  
-  function turn(creature, targets) {
+
+  turn(creature, targets) {
     const target = targets[0];
     if (!target) {
-      if (LOG) { console.log(`There are no opponents for ${creature.name} to target.`)}
+      if (LOG) { console.log(`There are no opponents for ${creature.name} to target.`) }
       return;
     }
-  
-    const toHit = dice('1d20') + creature.toHit;
+
+    const toHit = this.dice('1d20') + creature.toHit;
     if (toHit < target.ac) {
       // Miss!
       return;
     }
 
-    const damage = creature.damage(dice);
+    const damage = creature.damage(this.dice);
     target.hp -= damage;
-  
+
     let message = `${creature.type} ${creature.name} hits ${target.name} for ${damage} points of damage. `
-  
+
     if (target.hp <= 0) {
       targets.splice(0, 1);
       message += `${target.name} was defeated!`;
@@ -48,29 +52,21 @@ module.exports = function(dice) {
     }
     if (LOG) { console.log(message); }
   }
-  
-  function winner(creatures) {
+
+  winner(creatures) {
     if (creatures.filter(c => c.type === 'player').length === 0) { return 'monsters'; }
     if (creatures.filter(c => c.type === 'monster').length === 0) { return 'players'; }
     return undefined;
   }
-  
-  function run(creatures) {
-    let curRound = initiative(creatures), w = undefined;
-    while (!(w = winner(curRound))) {
-      curRound = round(curRound);
+
+  run(creatures) {
+    let w, curRound = this.initiative(creatures);
+    while (!(w = this.winner(curRound))) {
+      curRound = this.round(curRound);
     }
     return {
       winner: w,
       survivors: curRound.map(c => c.name)
     };
   }
-
-  return {
-    initiative,
-    round,
-    turn,
-    run,
-    winner
-  }
-};
+}
