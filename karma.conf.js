@@ -31,8 +31,14 @@ module.exports = function (config) {
         instrumentation: true
       },
       compilerOptions: {
-        "lib": [
-          "es2016",
+        baseUrl: ".",
+        paths: {
+          "@sim*": [
+            "src/*"
+          ]
+        },
+        lib: [
+          "es2017",
           "dom"
         ]
       },

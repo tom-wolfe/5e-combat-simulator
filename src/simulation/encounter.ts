@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
 import { Dice, RandomProvider } from 'dice-typescript';
 
-import { Creature, CreatureType, EncounterCreature } from './models/creature';
-import { EncounterResult } from './models/encounter';
+import { Creature, CreatureType, EncounterCreature } from '@sim/models/creature';
+import { EncounterResult } from '@sim/models/encounter';
 
 export class Encounter {
   private dice: Dice;

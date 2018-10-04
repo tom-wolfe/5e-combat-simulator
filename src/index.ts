@@ -1,5 +1,5 @@
-import { Creature } from './models/creature';
-import { Simulator } from './simulator';
+import { Creature } from '@sim/models/creature';
+import { Simulator } from '@sim/simulation/simulator';
 
 const creatures: Creature[] = [
   { name: 'D\'artagnan', type: 'player', ac: 16, toHit: 8, damage: '2d8 + 4', maxHp: 26, initiativeBonus: -1 },

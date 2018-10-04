@@ -1,5 +1,6 @@
-import { Encounter } from '../src/encounter';
-import { Creature, EncounterCreature } from '../src/models/creature';
+import { Creature, EncounterCreature } from '@sim/models/creature';
+import { Encounter } from '@sim/simulation/encounter';
+
 import * as Dice from './utils/dice';
 
 describe('encounter', () => {
@@ -83,7 +84,7 @@ describe('encounter', () => {
         name: '', type: 'monster', ac: 14, toHit: 0, damage: '', hp: 10, maxHp: 10, initiative: 20, initiativeBonus: 2
       };
 
-      const encounter = new Encounter(new Dice.SequentialProvider([11, 2]));
+      const encounter = new Encounter(new Dice.SequentialProvider([11]));
       const result = encounter.toHit(creature, target);
       expect(result).toBeTruthy();
     });
@@ -117,7 +118,7 @@ describe('encounter', () => {
         { name: '', type: 'monster', ac: 14, toHit: 6, damage: '', hp: 10, maxHp: 10, initiative: 20, initiativeBonus: 2 },
       ];
 
-      const encounter = new Encounter(new Dice.ConstantProvider(4));
+      const encounter = new Encounter();
       const winner = encounter.winner(creatures);
       expect(winner).toBeFalsy();
     });
@@ -128,7 +129,7 @@ describe('encounter', () => {
         { name: '', type: 'monster', ac: 14, toHit: 6, damage: '', hp: 10, maxHp: 10, initiative: 20, initiativeBonus: 2 },
       ];
 
-      const encounter = new Encounter(new Dice.ConstantProvider(4));
+      const encounter = new Encounter();
       const winner = encounter.winner(creatures);
       expect(winner).toEqual('monster');
     });

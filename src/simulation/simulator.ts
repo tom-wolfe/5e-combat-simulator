@@ -1,6 +1,7 @@
+import { Creature } from '@sim/models/creature';
+import { SimulationResult } from '@sim/models/simulation';
+
 import { Encounter } from './encounter';
-import { Creature } from './models/creature';
-import { SimulationResult } from './models/simulation';
 
 export class Simulator {
   simulate(creatures: Creature[], battles: number): SimulationResult {
