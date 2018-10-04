@@ -12,7 +12,7 @@
     "lint:fix": "tslint -p ./tsconfig.json --fix",
     "tsc": "tsc --project ./tsconfig.build.json",
     "test": "npm run lint && karma start --single-run",
-    "test_watch": "karma start"
+    "test:watch": "karma start"
   },
   "repository": {
     "type": "git",
