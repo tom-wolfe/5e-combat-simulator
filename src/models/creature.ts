@@ -1,4 +1,4 @@
-import { DiceFunction } from '../dice';
+import { DiceRoll } from '../dice';
 
 export type CreatureType = 'player' | 'monster';
 
@@ -6,7 +6,7 @@ export interface Creature {
   name: string,
   type: CreatureType,
   ac: number,
-  damage: (d: DiceFunction) => number;
+  damage: string;
   toHit: number,
   maxHp: number,
   initiativeBonus: number;

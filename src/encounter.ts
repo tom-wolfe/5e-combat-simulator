@@ -1,48 +1,62 @@
 import * as _ from 'lodash';
 
-import { DiceFunction } from './dice';
+import { DiceRoll } from './dice';
 import { EncounterCreature, Creature, CreatureType } from './models/creature';
 import { EncounterResult } from './models/encounter';
 
 export class Encounter {
-
-  constructor(private dice: DiceFunction) { }
+  constructor(private dice: DiceRoll) { }
 
   begin(creatures: Creature[]): EncounterCreature[] {
     const output: EncounterCreature[] = creatures.map(c => _.merge({}, c, { hp: 0, initiative: 0 }));
-    this.resetHp(output);
-    this.initiative(output);
+    output.forEach(c => {
+      c.hp = c.maxHp;
+      c.initiative = this.dice('1d20') + c.initiativeBonus;
+    });
     return output;
   }
 
-  resetHp(creatures: EncounterCreature[]) {
-    creatures.forEach(c => c.hp = c.maxHp);
-  }
-
-  initiative(creatures: EncounterCreature[]) {
-    creatures.forEach(c => c.initiative = this.dice('1d20') + c.initiativeBonus);
+  turnOrder(creatures: EncounterCreature[]): EncounterCreature[] {
+    return _.orderBy(creatures, c => c.initiative, 'desc');
   }
 
   round(creatures: EncounterCreature[]) {
-    _.orderBy(creatures, c => c.initiative, 'desc').forEach(c => {
+    this.turnOrder(creatures).forEach(c => {
       if (c.hp > 0) {
         this.turn(c, creatures);
       }
     });
   }
 
-  turn(creature: EncounterCreature, creatures: EncounterCreature[]) {
+  target(creature: Creature, creatures: EncounterCreature[]): EncounterCreature {
     const targets = creatures.filter(c => c.type !== creature.type);
-    if (targets.length === 0) { return; }
+    return targets[0];
+  }
 
-    const target = targets[0];
-    const toHit = this.dice('1d20') + creature.toHit;
-    if (toHit < target.ac) { return; }
+  toHit(creature: EncounterCreature, target: EncounterCreature): boolean {
+    return this.dice('1d20') + creature.toHit >= target.ac
+  }
 
-    const damage = creature.damage(this.dice);
-    target.hp -= damage;
+  damage(creature: EncounterCreature, target: EncounterCreature) {
+    target.hp -= this.dice(creature.damage);
+  }
 
-    if (target.hp <= 0) { creatures.splice(creatures.indexOf(target), 1); }
+  attack(creature: EncounterCreature, target: EncounterCreature) {
+    if (!this.toHit(creature, target)) { return; }
+    this.damage(target, creature);
+  }
+
+  checkUnconscious(creatures: EncounterCreature[]) {
+    const unconscious = creatures.filter(c => c.hp <= 0);
+    unconscious.forEach(c => {
+      creatures.splice(creatures.indexOf(c), 1);
+    });
+  }
+
+  turn(creature: EncounterCreature, creatures: EncounterCreature[]) {
+    const target = this.target(creature, creatures);
+    this.attack(creature, target);
+    this.checkUnconscious(creatures);
   }
 
   winner(creatures: EncounterCreature[]): CreatureType {
