@@ -1,72 +1,65 @@
 import * as _ from 'lodash';
 
 import { DiceFunction } from './dice';
-
-const LOG = false;
+import { EncounterCreature, Creature, CreatureType } from './models/creature';
+import { EncounterResult } from './models/encounter';
 
 export class Encounter {
 
   constructor(private dice: DiceFunction) { }
 
-  initiative(creatures) {
-    let rolled = creatures.map(c => ({ ...c, initiative: this.dice('1d20') + c.initiativeBonus }));
-    rolled = _.orderBy(rolled, c => c.initiative, 'desc');
-    if (LOG) { console.log('Initiative: ', rolled.map(c => `${c.initiative}: ${c.name}`).join(', ')); }
-    return rolled;
+  begin(creatures: Creature[]): EncounterCreature[] {
+    const output: EncounterCreature[] = creatures.map(c => _.merge({}, c, { hp: 0, initiative: 0 }));
+    this.resetHp(output);
+    this.initiative(output);
+    return output;
   }
 
-  round(creatures) {
-    const players = creatures.filter(c => c.type === 'player');
-    const monsters = creatures.filter(c => c.type === 'monster');
+  resetHp(creatures: EncounterCreature[]) {
+    creatures.forEach(c => c.hp = c.maxHp);
+  }
+
+  initiative(creatures: EncounterCreature[]) {
+    creatures.forEach(c => c.initiative = this.dice('1d20') + c.initiativeBonus);
+  }
+
+  round(creatures: EncounterCreature[]) {
     _.orderBy(creatures, c => c.initiative, 'desc').forEach(c => {
       if (c.hp > 0) {
-        this.turn(c, c.type === 'monster' ? players : monsters);
+        this.turn(c, creatures);
       }
     });
-    return [...players, ...monsters];
   }
 
-  turn(creature, targets) {
-    const target = targets[0];
-    if (!target) {
-      if (LOG) { console.log(`There are no opponents for ${creature.name} to target.`) }
-      return;
-    }
+  turn(creature: EncounterCreature, creatures: EncounterCreature[]) {
+    const targets = creatures.filter(c => c.type !== creature.type);
+    if (targets.length === 0) { return; }
 
+    const target = targets[0];
     const toHit = this.dice('1d20') + creature.toHit;
-    if (toHit < target.ac) {
-      // Miss!
-      return;
-    }
+    if (toHit < target.ac) { return; }
 
     const damage = creature.damage(this.dice);
     target.hp -= damage;
 
-    let message = `${creature.type} ${creature.name} hits ${target.name} for ${damage} points of damage. `
-
-    if (target.hp <= 0) {
-      targets.splice(0, 1);
-      message += `${target.name} was defeated!`;
-    } else {
-      message += `${target.hp}hp remaining.`;
-    }
-    if (LOG) { console.log(message); }
+    if (target.hp <= 0) { creatures.splice(creatures.indexOf(target), 1); }
   }
 
-  winner(creatures) {
-    if (creatures.filter(c => c.type === 'player').length === 0) { return 'monsters'; }
-    if (creatures.filter(c => c.type === 'monster').length === 0) { return 'players'; }
+  winner(creatures: EncounterCreature[]): CreatureType {
+    if (creatures.filter(c => c.type === 'player').length === 0) { return 'monster'; }
+    if (creatures.filter(c => c.type === 'monster').length === 0) { return 'player'; }
     return undefined;
   }
 
-  run(creatures) {
-    let w, curRound = this.initiative(creatures);
-    while (!(w = this.winner(curRound))) {
-      curRound = this.round(curRound);
+  run(creatures: Creature[]): EncounterResult {
+    const round = this.begin(creatures);
+    let winner: CreatureType;
+    while (!(winner = this.winner(round))) {
+      this.round(round);
     }
     return {
-      winner: w,
-      survivors: curRound.map(c => c.name)
+      winner,
+      survivors: round.map(c => c.name)
     };
   }
 }
