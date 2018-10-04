@@ -29,12 +29,12 @@ export class Encounter {
   }
 
   target(creature: Creature, creatures: EncounterCreature[]): EncounterCreature {
-    const targets = creatures.filter(c => c.type !== creature.type);
+    const targets = creatures.filter(c => c.type !== creature.type && c.hp > 0);
     return targets[0];
   }
 
   toHit(creature: EncounterCreature, target: EncounterCreature): boolean {
-    return this.dice('1d20') + creature.toHit >= target.ac
+    return this.dice('1d20') + creature.toHit >= target.ac;
   }
 
   damage(creature: EncounterCreature, target: EncounterCreature) {
@@ -46,22 +46,15 @@ export class Encounter {
     this.damage(target, creature);
   }
 
-  checkUnconscious(creatures: EncounterCreature[]) {
-    const unconscious = creatures.filter(c => c.hp <= 0);
-    unconscious.forEach(c => {
-      creatures.splice(creatures.indexOf(c), 1);
-    });
-  }
-
   turn(creature: EncounterCreature, creatures: EncounterCreature[]) {
     const target = this.target(creature, creatures);
+    if (!target) { return; }
     this.attack(creature, target);
-    this.checkUnconscious(creatures);
   }
 
   winner(creatures: EncounterCreature[]): CreatureType {
-    if (creatures.filter(c => c.type === 'player').length === 0) { return 'monster'; }
-    if (creatures.filter(c => c.type === 'monster').length === 0) { return 'player'; }
+    if (creatures.filter(c => c.type === 'player' && c.hp > 0).length === 0) { return 'monster'; }
+    if (creatures.filter(c => c.type === 'monster' && c.hp > 0).length === 0) { return 'player'; }
     return undefined;
   }
 

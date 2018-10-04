@@ -39,6 +39,16 @@ describe('encounter', () => {
       const output = encounter.target(creatures[0], creatures);
       expect(output).toBe(creatures[1]);
     });
+    it('should ignore unconscious targets.', () => {
+      const creatures: EncounterCreature[] = [
+        { name: '', type: 'player', ac: 14, toHit: 6, damage: '', hp: 10, maxHp: 10, initiative: 10, initiativeBonus: 2 },
+        { name: '', type: 'monster', ac: 14, toHit: 6, damage: '', hp: 0, maxHp: 10, initiative: 15, initiativeBonus: 2 },
+        { name: '', type: 'monster', ac: 14, toHit: 6, damage: '', hp: 10, maxHp: 10, initiative: 20, initiativeBonus: 2 },
+      ];
+      const encounter = new Encounter(Dice.constant(5));
+      const output = encounter.target(creatures[0], creatures);
+      expect(output).toBe(creatures[2]);
+    });
   });
   describe('toHit', () => {
     it('should miss if they rolled under AC.', () => {
@@ -92,8 +102,8 @@ describe('encounter', () => {
       expect(target.hp).toBe(6);
     });
   });
-  describe('checkUnconscious', () => {
-    it('should remove any unconscious creatures.', () => {
+  describe('winner', () => {
+    it('should return undefined if there are no winners.', () => {
       const creatures: EncounterCreature[] = [
         { name: '', type: 'player', ac: 14, toHit: 6, damage: '', hp: 10, maxHp: 10, initiative: 10, initiativeBonus: 2 },
         { name: '', type: 'monster', ac: 14, toHit: 6, damage: '', hp: 0, maxHp: 10, initiative: 15, initiativeBonus: 2 },
@@ -101,8 +111,19 @@ describe('encounter', () => {
       ];
 
       const encounter = new Encounter(Dice.sequential(4));
-      encounter.checkUnconscious(creatures);
-      expect(creatures.length).toBe(2);
+      const winner = encounter.winner(creatures);
+      expect(winner).toBeFalsy();
+    });
+    it('should return the correct winner.', () => {
+      const creatures: EncounterCreature[] = [
+        { name: '', type: 'player', ac: 14, toHit: 6, damage: '', hp: 0, maxHp: 10, initiative: 10, initiativeBonus: 2 },
+        { name: '', type: 'monster', ac: 14, toHit: 6, damage: '', hp: 0, maxHp: 10, initiative: 15, initiativeBonus: 2 },
+        { name: '', type: 'monster', ac: 14, toHit: 6, damage: '', hp: 10, maxHp: 10, initiative: 20, initiativeBonus: 2 },
+      ];
+
+      const encounter = new Encounter(Dice.sequential(4));
+      const winner = encounter.winner(creatures);
+      expect(winner).toEqual('monster');
     });
   });
 });
