@@ -33,7 +33,7 @@ module.exports = function (config) {
       compilerOptions: {
         baseUrl: ".",
         paths: {
-          "@sim*": [
+          "@sim/*": [
             "src/*"
           ]
         },

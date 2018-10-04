@@ -1,13 +1,15 @@
+import { DamageRoll } from '@sim/models/damage';
+
 export type CreatureType = 'player' | 'monster';
 
 export interface Creature {
   name: string,
   type: CreatureType,
   ac: number,
-  damage: string;
+  damage: DamageRoll;
   toHit: number,
   maxHp: number,
-  initiativeBonus: number;
+  initiativeMod: number;
 }
 
 export interface EncounterCreature extends Creature {

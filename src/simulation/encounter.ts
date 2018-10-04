@@ -1,8 +1,8 @@
-import * as _ from 'lodash';
-import { Dice, RandomProvider } from 'dice-typescript';
-
 import { Creature, CreatureType, EncounterCreature } from '@sim/models/creature';
+import { Hit } from '@sim/models/damage';
 import { EncounterResult } from '@sim/models/encounter';
+import { Dice, RandomProvider } from 'dice-typescript';
+import * as _ from 'lodash';
 
 export class Encounter {
   private dice: Dice;
@@ -18,7 +18,7 @@ export class Encounter {
     const output: EncounterCreature[] = creatures.map(c => _.merge({}, c, { hp: 0, initiative: 0 }));
     output.forEach(c => {
       c.hp = c.maxHp;
-      c.initiative = this.roll('1d20') + c.initiativeBonus;
+      c.initiative = this.roll('1d20') + c.initiativeMod;
     });
     return output;
   }
@@ -40,12 +40,19 @@ export class Encounter {
     return targets[0];
   }
 
-  toHit(creature: EncounterCreature, target: EncounterCreature): boolean {
-    return this.roll('1d20') + creature.toHit >= target.ac;
+  toHit(creature: EncounterCreature, target: EncounterCreature): Hit {
+    const d20 = this.roll('1d20');
+    if (d20 === 20) { return 'crit'; };
+    return d20 + creature.toHit >= target.ac ? 'hit' : 'miss';
   }
 
-  calculateDamage(creature: EncounterCreature) {
-    return this.roll(creature.damage);
+  calculateDamage(creature: EncounterCreature, hit: Hit): number {
+    if (hit === 'miss') { return 0; }
+    let total = this.roll(creature.damage.dice) + creature.damage.mod;
+    if (hit === 'crit') {
+      total += this.roll(creature.damage.dice);
+    }
+    return total;
   }
 
   dealDamage(creature: EncounterCreature, damage: number) {
@@ -53,8 +60,8 @@ export class Encounter {
   }
 
   attack(creature: EncounterCreature, target: EncounterCreature) {
-    if (!this.toHit(creature, target)) { return; }
-    const damage = this.calculateDamage(creature);
+    const hit = this.toHit(creature, target);
+    const damage = this.calculateDamage(creature, hit);
     this.dealDamage(target, damage);
   }
 
