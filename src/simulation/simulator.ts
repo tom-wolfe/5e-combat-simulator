@@ -90,7 +90,7 @@ export class Simulator {
   }
 
   dealDamage(target: Creature, damages: Damage[]) {
-    target.hp -= Attack.totalDamage(target, damages);
+    target.hp -= Attack.totalDamage(damages);
   }
 
   winner(encounter: Encounter): CreatureType {

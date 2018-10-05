@@ -52,11 +52,16 @@ export function saveDamage(action: Models.Action, hit: Models.Hit, roll: RollDic
   }
 }
 
-export function rollAllDamage(action: Models.Action, roll: RollDice, critical?: CriticalStrategy): Damage[] {
+export function totalDamage(damages: Damage[]): number {
+  // TODO: Factor in resistance.
+  return _.sum(damages.map(d => d.amount));
+}
+
+function rollAllDamage(action: Models.Action, roll: RollDice, critical?: CriticalStrategy): Damage[] {
   return action.damages.map(d => rollDamage(d, roll, critical));
 }
 
-export function rollDamage(damage: DamageRoll, roll: RollDice, critical?: CriticalStrategy): Damage {
+function rollDamage(damage: DamageRoll, roll: RollDice, critical?: CriticalStrategy): Damage {
   return {
     amount: (critical || normalDamage)(damage, roll),
     type: damage.type,
@@ -64,14 +69,10 @@ export function rollDamage(damage: DamageRoll, roll: RollDice, critical?: Critic
   };
 }
 
-export function normalDamage(damage: DamageRoll, roll: RollDice): number {
+function normalDamage(damage: DamageRoll, roll: RollDice): number {
   let amount = 0;
   if (damage.dice) { amount += roll(damage.dice); }
   if (damage.mod) { amount += damage.mod; }
   return amount;
 }
 
-export function totalDamage(target: Models.Creature, damages: Damage[]): number {
-  // TODO: Factor in resistance.
-  return _.sum(damages.map(d => d.amount));
-}

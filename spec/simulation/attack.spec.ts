@@ -1,10 +1,11 @@
-import { Action } from '@sim/models';
+import { Action, Damage } from '@sim/models';
 import { Creature } from '@sim/models/creature';
 import * as Attack from '@sim/simulation/attack';
 
 describe('attack', () => {
   const attack: Action = { name: '', method: 'attack', mod: 5, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }] };
-  const save: Action = { name: '', method: 'save', mod: 16, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }], halfOnSuccess: true };
+  const save: Action = { name: '', method: 'save', mod: 16, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }], halfOnSuccess: false };
+  const saveHalf: Action = { name: '', method: 'save', mod: 16, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }], halfOnSuccess: true };
   const target: Creature = {
     name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2
   };
@@ -58,61 +59,66 @@ describe('attack', () => {
     //   expect(result).toEqual('miss');
     // });
   });
-
   describe('calculateDamage', () => {
     it('returns 0 on missed attack.', () => {
       const result = Attack.calculateDamage(attack, 'miss', roll(5), null);
       expect(result.length).toEqual(0);
     });
     it('rolls half damage on missed save.', () => {
-      const result = Attack.calculateDamage(save, 'miss', roll(6), null);
+      const result = Attack.calculateDamage(saveHalf, 'miss', roll(6), null);
       expect(result.length).toEqual(1);
       expect(result[0].amount).toEqual(3);
     });
   });
-
-  // TODO: attackDamage method.
-  // TODO: saveDamage method.
-  // TODO: rollAllDamage method.
-  // TODO: rollDamage method.
-  // TODO: normalDamage method.
-  // TODO: totalDamage method.
-
-  // TODO: Make these work again.
-  // describe('calculateDamage', () => {
-  //   it('should roll normal damage on a hit.', () => {
-  //     const action: Action = {
-  //       name: 'Greatsword', method: 'attack', mod: 0, damages: [{ dice: '2d6', mod: 0, type: 'slashing' }]
-  //     };
-  //     const roll = _ => 4;
-  //     const crit = (_, _2) => 9999;
-  //     const damage = Attack.calculateDamage(action, 'hit', roll, crit);
-
-  //     expect(damage.length).toEqual(1);
-  //     expect(damage[0].amount).toEqual(8);
-  //     expect(damage[0].type).toEqual('slashing');
-  //   });
-  //   it('should not return damage on a miss.', () => {
-  //     const action: Action = {
-  //       name: 'Greatsword', method: 'attack', mod: 0, damages: [{ dice: '2d6', mod: 0, type: 'slashing' }]
-  //     };
-  //     const roll = _ => 4;
-  //     const crit = (_, _2) => 9999;
-  //     const damage = Attack.calculateDamage(action, 'miss', roll, crit);
-
-  //     expect(damage.length).toEqual(0);
-  //   });
-  //   it('should call the critical strategy on a crit.', () => {
-  //     const action: Action = {
-  //       name: 'Greatsword', method: 'attack', mod: 0, damages: [{ dice: '2d6', mod: 0, type: 'slashing' }]
-  //     };
-  //     const roll = _ => 4;
-  //     const crit = (_, _2) => 9999;
-  //     const damage = Attack.calculateDamage(action, 'hit', roll, crit);
-
-  //     expect(damage.length).toEqual(1);
-  //     expect(damage[0].amount).toEqual(9999);
-  //     expect(damage[0].type).toEqual('slashing');
-  //   });
-  // });
+  describe('attackDamage', () => {
+    it('should return nothing if they miss.', () => {
+      const result = Attack.attackDamage(attack, 'miss', roll(5), null);
+      expect(result.length).toEqual(0);
+    });
+    it('should roll regular damage if they hit.', () => {
+      const result = Attack.attackDamage(attack, 'hit', roll(5), null);
+      expect(result.length).toEqual(1);
+      expect(result[0].amount).toEqual(5);
+    });
+    it('should roll double damage if they crit.', () => {
+      const result = Attack.attackDamage(attack, 'crit', roll(5), roll(10));
+      expect(result.length).toEqual(1);
+      expect(result[0].amount).toEqual(10);
+    });
+  });
+  describe('saveDamage', () => {
+    it('should return nothing if they save and it\'s not half on save.', () => {
+      const result = Attack.saveDamage(save, 'miss', roll(5));
+      expect(result.length).toEqual(0);
+    });
+    it('should roll half damage if they save and it\'s half on save..', () => {
+      const result = Attack.saveDamage(saveHalf, 'miss', roll(6));
+      expect(result.length).toEqual(1);
+      expect(result[0].amount).toEqual(3);
+    });
+    it('should roll normal damage on hit.', () => {
+      const result = Attack.saveDamage(saveHalf, 'hit', roll(6));
+      expect(result.length).toEqual(1);
+      expect(result[0].amount).toEqual(6);
+    });
+    it('should roll normal damage on crit.', () => {
+      const result = Attack.saveDamage(saveHalf, 'crit', roll(6));
+      expect(result.length).toEqual(1);
+      expect(result[0].amount).toEqual(6);
+    });
+  });
+  describe('totalDamage', () => {
+    it('should return zero for empty damage.', () => {
+      const result = Attack.totalDamage([]);
+      expect(result).toEqual(0);
+    });
+    it('should sum all damages.', () => {
+      const damage: Damage[] = [
+        { amount: 10, magical: false, type: 'bludgeoning' },
+        { amount: 10, magical: true, type: 'slashing' }
+      ]
+      const result = Attack.totalDamage(damage);
+      expect(result).toEqual(20);
+    });
+  });
 });
