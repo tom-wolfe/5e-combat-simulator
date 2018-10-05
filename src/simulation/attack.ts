@@ -2,11 +2,11 @@ import * as Models from '@sim/models';
 import { RollDice, DamageRoll, Action, Damage, CriticalStrategy } from '@sim/models';
 import * as _ from 'lodash';
 
-export function doesHit(action: Models.Action, target: Models.Creature): Models.Hit {
+export function doesHit(action: Models.Action, target: Models.Creature, roll: RollDice): Models.Hit {
   if (action.method === 'attack') {
-    return this.toHit(action, target);
+    return toHit(action, target, roll);
   } else {
-    return this.savingThrow(action, target);
+    return savingThrow(action, target, roll);
   }
 }
 

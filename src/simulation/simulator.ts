@@ -83,7 +83,7 @@ export class Simulator {
 
   attack(action: Action, targets: Creature[], encounter: Encounter) {
     targets.forEach(target => {
-      const hit = Attack.doesHit(action, target);
+      const hit = Attack.doesHit(action, target, encounter.roll);
       const damages = Attack.calculateDamage(action, hit, encounter.roll, encounter.critical);
       this.dealDamage(target, damages);
     });
