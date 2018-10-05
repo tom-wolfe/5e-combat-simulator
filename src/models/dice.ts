@@ -1,1 +1,1 @@
-export type DiceRoller = (input: string) => number;
+export type RollDice = (input: string) => number;
