@@ -7,4 +7,5 @@ export interface SimulationResult {
   survivors: {
     [name: string]: number;
   }
+  averageRounds: number;
 }

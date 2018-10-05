@@ -13,8 +13,8 @@ export const first: DefensiveStrategy = (current: Creature, encounter: Encounter
 export const random: OffensiveStrategy = (current: Creature, encounter: Encounter): TargettedAction => {
   const targets = allied(current, encounter);
   return {
-    action: current.actions[encounter.random.numberBetween(0, current.actions.length)],
-    targets: [targets[encounter.random.numberBetween(0, targets.length)]]
+    action: current.actions[encounter.random.numberBetween(0, current.actions.length - 1)],
+    targets: [targets[encounter.random.numberBetween(0, targets.length - 1)]]
   };
 }
 

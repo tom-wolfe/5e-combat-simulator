@@ -17,4 +17,5 @@ export interface Encounter {
 export interface EncounterResult {
   winner: CreatureType;
   survivors: string[];
+  rounds: number;
 }

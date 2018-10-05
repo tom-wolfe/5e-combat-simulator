@@ -10,21 +10,30 @@ import * as _ from 'lodash';
 import * as Attack from './attack';
 
 export class Simulator {
+  log: (message: string) => void = _message => { };
 
   simulate(encounter: Encounter, battles: number): SimulationResult {
     const simulationResult: SimulationResult = {
       battles,
       wins: { monster: 0, player: 0 },
-      survivors: {}
-    }
+      survivors: {},
+      averageRounds: 0
+    };
 
+    this.log(`Running simulation ${battles} times.`);
     for (let x = 0; x < battles; x++) {
       const encounterResult = this.run(encounter);
+
+      this.log(`Outcome of battle ${x + 1} is: ${encounterResult.winner} after ${encounterResult.rounds} rounds.`);
+      this.log(`Survivors were: ${encounterResult.survivors.sort().join(', ')}`);
+
+      simulationResult.averageRounds += encounterResult.rounds;
       simulationResult.wins[encounterResult.winner]++;
       encounterResult.survivors.forEach(s => {
         simulationResult.survivors[s] = (simulationResult.survivors[s] || 0) + 1;
       });
     }
+    simulationResult.averageRounds /= battles;
 
     return simulationResult;
   }
@@ -33,12 +42,16 @@ export class Simulator {
     const round = _.cloneDeep(encounter);
     this.setDefaults(round);
     this.begin(round);
+    this.log(`Initiative order: ${this.turnOrder(round.creatures).map(c => c.name).join(', ')}.`)
     let winner: CreatureType;
+    let rounds = 0;
     while (!(winner = this.winner(round))) {
       this.round(round);
+      rounds++;
     }
     return {
       winner,
+      rounds,
       survivors: round.creatures.filter(c => c.hp > 0).map(c => c.name)
     };
   }
@@ -46,7 +59,7 @@ export class Simulator {
   setDefaults(encounter: Encounter) {
     encounter.approach = encounter.approach || Approach.offensive;
     encounter.critical = encounter.critical || Critical.rollTwice;
-    encounter.defensive = encounter.defensive || Defensive.first;
+    encounter.defensive = encounter.defensive || Defensive.random;
     encounter.offensive = encounter.offensive || Offensive.random;
     encounter.random = encounter.random || new DefaultRandomProvider();
     if (!encounter.roll) {
@@ -75,6 +88,10 @@ export class Simulator {
       : encounter.defensive(creature, encounter);
     if (action.targets.length === 0) { return; }
 
+    this.log(`${creature.name} is taking ${approach} action `
+      + `against ${action.targets.map(t => t.name).join(', ')} `
+      + `using ${action.action.name}.`);
+
     // TODO: Take different action if it's defensive.
     this.attack(action.action, action.targets, encounter);
   }
@@ -84,6 +101,8 @@ export class Simulator {
       const hit = Attack.doesHit(action, target, encounter.roll);
       const damages = Attack.calculateDamage(action, hit, encounter.roll, encounter.critical);
       this.dealDamage(target, damages);
+
+      this.log(`${action.name} ${hit} ${target.name} for ${Attack.totalDamage(damages)}.`);
     });
   }
 

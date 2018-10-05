@@ -110,7 +110,7 @@ describe('attack', () => {
   describe('totalDamage', () => {
     it('should return zero for empty damage.', () => {
       const result = Attack.totalDamage([]);
-      expect(result).toEqual(0);
+      expect(result).toBe(0);
     });
     it('should sum all damages.', () => {
       const damage: Damage[] = [
