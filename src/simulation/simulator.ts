@@ -76,8 +76,6 @@ export class Simulator {
     if (action.targets.length === 0) { return; }
 
     // TODO: Take different action if it's defensive.
-    // this.attack(creature, action, target);
-
     this.attack(action.action, action.targets, encounter);
   }
 

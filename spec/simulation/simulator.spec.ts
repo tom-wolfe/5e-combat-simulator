@@ -1,8 +1,6 @@
 import { Creature, Encounter } from '@sim/models';
-
-import * as Dice from '@spec/utils/dice';
-import * as _ from 'lodash';
 import { Simulator } from '@sim/simulation/simulator';
+import * as _ from 'lodash';
 
 const templateEncounter: Encounter = {
   creatures: [
