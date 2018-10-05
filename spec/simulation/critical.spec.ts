@@ -1,7 +1,6 @@
 import * as Critical from '@sim/simulation/critical';
+import * as Providers from '@spec/utils/dice';
 import { Dice } from 'dice-typescript';
-
-import * as Providers from './utils/dice';
 
 describe('critical', () => {
   describe('rollTwice', () => {

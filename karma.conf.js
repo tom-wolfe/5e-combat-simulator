@@ -35,6 +35,9 @@ module.exports = function (config) {
         paths: {
           "@sim/*": [
             "src/*"
+          ],
+          "@spec/*": [
+            "spec/*"
           ]
         },
         lib: [
