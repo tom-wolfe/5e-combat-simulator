@@ -1,27 +1,47 @@
 {
   "name": "5e-combat-simulator",
   "version": "1.0.0",
-  "description": "",
-  "main": "src/index.js",
+  "description": "A library for simulating combat in D&D 5th Edition.",
+  "main": "./dist/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "jasmine --config=jasmine.json"
+    "build": "npm run clean && npm run lint && npm run tsc",
+    "clean": "rimraf ./dist && rimraf ./coverage",
+    "coverage": "istanbul coverage",
+    "codacy": "cat ./coverage/lcov/lcov.info | codacy-coverage --verbose",
+    "lint": "tslint -p ./tsconfig.json",
+    "lint:fix": "tslint -p ./tsconfig.json --fix",
+    "tsc": "tsc --project ./tsconfig.build.json",
+    "test": "npm run lint && karma start --single-run",
+    "test:watch": "karma start"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/trwolfe13/5e-combat-simulator.git"
   },
-  "author": "Thomas R. Wolfe",
+  "author": "Thomas R. Wolfe <trwolfe13@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/trwolfe13/5e-combat-simulator/issues"
   },
   "homepage": "https://github.com/trwolfe13/5e-combat-simulator#readme",
   "dependencies": {
+    "dice-typescript": "^1.5.0",
     "lodash": "^4.17.11",
     "random-js": "^1.0.8"
   },
   "devDependencies": {
-    "jasmine": "^3.2.0"
+    "@types/jasmine": "^2.8.9",
+    "@types/lodash": "^4.14.116",
+    "@types/random-js": "^1.0.31",
+    "codacy-coverage": "^3.1.0",
+    "istanbul": "^0.4.5",
+    "jasmine-core": "^3.2.1",
+    "karma": "^3.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.2",
+    "karma-typescript": "^3.0.13",
+    "rimraf": "^2.6.2",
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.1"
   }
 }
