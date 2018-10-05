@@ -42,7 +42,7 @@ export function saveDamage(action: Models.Action, hit: Models.Hit, roll: RollDic
   if (hit === 'miss') {
     if (action.halfOnSuccess) {
       const damage = rollAllDamage(action, roll, null);
-      damage.forEach(d => d.amount /= 2);
+      damage.forEach(d => d.amount = Math.floor(d.amount / 2));
       return damage;
     } else {
       return [];

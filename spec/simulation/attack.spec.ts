@@ -3,8 +3,8 @@ import { Creature } from '@sim/models/creature';
 import * as Attack from '@sim/simulation/attack';
 
 describe('attack', () => {
-  const attack: Action = { name: '', method: 'attack', mod: 5, damages: [{ dice: '', mod: 0, type: 'slashing' }] };
-  const save: Action = { name: '', method: 'save', mod: 16, damages: [{ dice: '', mod: 0, type: 'slashing' }] };
+  const attack: Action = { name: '', method: 'attack', mod: 5, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }] };
+  const save: Action = { name: '', method: 'save', mod: 16, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }], halfOnSuccess: true };
   const target: Creature = {
     name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2
   };
@@ -59,7 +59,18 @@ describe('attack', () => {
     // });
   });
 
-  // TODO: calculateDamage method.
+  describe('calculateDamage', () => {
+    it('returns 0 on missed attack.', () => {
+      const result = Attack.calculateDamage(attack, 'miss', roll(5), null);
+      expect(result.length).toEqual(0);
+    });
+    it('rolls half damage on missed save.', () => {
+      const result = Attack.calculateDamage(save, 'miss', roll(6), null);
+      expect(result.length).toEqual(1);
+      expect(result[0].amount).toEqual(3);
+    });
+  });
+
   // TODO: attackDamage method.
   // TODO: saveDamage method.
   // TODO: rollAllDamage method.
