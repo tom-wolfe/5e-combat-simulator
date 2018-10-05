@@ -20,6 +20,10 @@ export class Simulator {
       averageRounds: 0
     };
 
+    encounter.creatures.forEach(c => {
+      simulationResult.survivors[c.name] = 0;
+    });
+
     this.log(`Running simulation ${battles} times.`);
     for (let x = 0; x < battles; x++) {
       const encounterResult = this.run(encounter);
@@ -30,7 +34,7 @@ export class Simulator {
       simulationResult.averageRounds += encounterResult.rounds;
       simulationResult.wins[encounterResult.winner]++;
       encounterResult.survivors.forEach(s => {
-        simulationResult.survivors[s] = (simulationResult.survivors[s] || 0) + 1;
+        simulationResult.survivors[s] += 1;
       });
     }
     simulationResult.averageRounds /= battles;
@@ -88,7 +92,7 @@ export class Simulator {
       : encounter.defensive(creature, encounter);
     if (action.targets.length === 0) { return; }
 
-    this.log(`${creature.name} is taking ${approach} action `
+    this.log(`${creature.name} (${creature.hp}/${creature.maxHp}hp) is taking ${approach} action `
       + `against ${action.targets.map(t => t.name).join(', ')} `
       + `using ${action.action.name}.`);
 
@@ -100,14 +104,15 @@ export class Simulator {
     targets.forEach(target => {
       const hit = Attack.doesHit(action, target, encounter.roll);
       const damages = Attack.calculateDamage(action, hit, encounter.roll, encounter.critical);
-      this.dealDamage(target, damages);
-
       this.log(`${action.name} ${hit} ${target.name} for ${Attack.totalDamage(damages)}.`);
+
+      this.dealDamage(target, damages);
     });
   }
 
   dealDamage(target: Creature, damages: Damage[]) {
     target.hp -= Attack.totalDamage(damages);
+    this.log(`${target.name} has ${target.hp}/${target.maxHp}hp.`)
   }
 
   winner(encounter: Encounter): CreatureType {

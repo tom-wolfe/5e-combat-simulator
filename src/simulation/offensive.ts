@@ -3,7 +3,7 @@ import { Creature, Encounter, OffensiveStrategy, TargettedAction } from '@sim/mo
 import { opposing } from './targets';
 
 export const first: OffensiveStrategy = (current: Creature, encounter: Encounter): TargettedAction => {
-  const targets = opposing(current, encounter);
+  const targets = opposing(current, encounter).filter(c => c.hp > 0);
   return {
     action: current.actions[0],
     targets: targets.slice(0, 1)
@@ -11,10 +11,10 @@ export const first: OffensiveStrategy = (current: Creature, encounter: Encounter
 }
 
 export const random: OffensiveStrategy = (current: Creature, encounter: Encounter): TargettedAction => {
-  const targets = opposing(current, encounter);
+  const targets = opposing(current, encounter).filter(c => c.hp > 0);
   return {
     action: current.actions[encounter.random.numberBetween(0, current.actions.length - 1)],
-    targets: [targets[encounter.random.numberBetween(0, targets.length - 1)]]
+    targets: [targets[encounter.random.numberBetween(0, targets.length - 1)]].filter(t => t)
   };
 }
 

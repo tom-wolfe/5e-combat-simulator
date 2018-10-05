@@ -24,9 +24,6 @@ export function savingThrow(action: Models.Action, target: Models.Creature, roll
 }
 
 export function calculateDamage(action: Models.Action, hit: Models.Hit, roll: RollDice, critical: CriticalStrategy): Damage[] {
-  if (roll === undefined) {
-    throw Error('FUCKSAD{2');
-  }
   let damages: Damage[];
   switch (action.method) {
     case 'attack': damages = attackDamage(action, hit, roll, critical); break;
@@ -36,13 +33,9 @@ export function calculateDamage(action: Models.Action, hit: Models.Hit, roll: Ro
 }
 
 export function attackDamage(action: Models.Action, hit: Models.Hit, roll: RollDice, critical: CriticalStrategy): Damage[] {
-  if (roll === undefined) {
-    throw Error('FUCKSAD{2');
-  }
-  let damages: Damage[];
+  let damages: Damage[] = [];
   switch (hit) {
-    case 'miss': damages = []; break; // No damage.
-    case 'hit': damages = rollAllDamage(action, roll, critical); break;
+    case 'hit': damages = rollAllDamage(action, roll, null); break;
     case 'crit': damages = rollAllDamage(action, roll, critical); break;
   }
   return damages;
@@ -68,34 +61,19 @@ export function totalDamage(damages: Damage[]): number {
 }
 
 function rollAllDamage(action: Models.Action, roll: RollDice, critical?: CriticalStrategy): Damage[] {
-  if (roll === undefined) {
-    throw Error('FUCKSAD{2');
-  }
   return action.damages.map(d => rollDamage(d, roll, critical));
 }
 
 function rollDamage(damage: DamageRoll, roll: RollDice, critical?: CriticalStrategy): Damage {
-  if (roll === undefined) {
-    throw Error('FUCKSAD{2');
-  }
   const dmg: Damage = {
     amount: critical ? critical(damage, roll) : normalDamage(damage, roll),
     type: damage.type,
     magical: !!damage.magical
-  }
-
-  if (Number.isNaN(dmg.amount)) {
-    console.log(JSON.stringify(roll));
-    throw Error('FUCK');
-  }
-
+  };
   return dmg;
 }
 
 function normalDamage(damage: DamageRoll, roll: RollDice): number {
-  if (roll === undefined) {
-    throw Error('FUCKSAD{2');
-  }
   let amount = 0;
   if (damage.dice) { amount += (roll(damage.dice) || 0); }
   if (damage.mod) { amount += (damage.mod || 0); }

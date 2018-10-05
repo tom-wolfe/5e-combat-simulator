@@ -31,7 +31,7 @@ const sebastian: Creature = {
       name: 'Fire Bolt',
       method: 'attack',
       mod: 6,
-      damages: [{ dice: '1d10', type: 'fire', magical: true }]
+      damages: [{ dice: '1d8', type: 'fire', magical: true }]
     }
   ],
 };
@@ -47,7 +47,7 @@ const patricia: Creature = {
       name: 'Fire Bolt',
       method: 'attack',
       mod: 6,
-      damages: [{ dice: '1d10', type: 'fire', magical: true }]
+      damages: [{ dice: '1d8', type: 'fire', magical: true }]
     }
   ],
 };
@@ -63,7 +63,7 @@ const neferi: Creature = {
       name: 'Fire Bolt',
       method: 'attack',
       mod: 6,
-      damages: [{ dice: '1d10', type: 'fire', magical: true }]
+      damages: [{ dice: '1d8', type: 'fire', magical: true }]
     }
   ],
 };
@@ -79,7 +79,7 @@ const vennris: Creature = {
       name: 'Fire Bolt',
       method: 'attack',
       mod: 6,
-      damages: [{ dice: '1d10', type: 'fire', magical: true }]
+      damages: [{ dice: '1d8', type: 'fire', magical: true }]
     }
   ],
 };
@@ -87,26 +87,32 @@ const vennris: Creature = {
 const monster: Creature = {
   name: '???',
   type: 'monster',
-  ac: 50,
-  maxHp: 1000,
+  ac: 16,
+  maxHp: 200,
   initiativeMod: 3,
   actions: [
     {
       name: 'Unarmed Strike',
       method: 'attack',
       mod: 7,
-      damages: [{ dice: '5d8', mod: 4, type: 'bludgeoning' }]
+      damages: [{ dice: '3d8', mod: 4, type: 'bludgeoning' }]
+    },
+    {
+      name: 'Bite',
+      method: 'attack',
+      mod: 7,
+      damages: [{ dice: '3d6', mod: 4, type: 'necrotic' }]
     }
   ],
 };
 
-const battles = 1000;
+const battles = 100;
 const encounter: Encounter = {
   creatures: [dartagnan, sebastian, patricia, neferi, vennris, monster]
 };
 
 const simulator = new Simulator();
-// simulator.log = console.log;
+simulator.log = console.log;
 const result = simulator.simulate(encounter, battles);
 
 const success = result.wins.player / battles * 100;

@@ -61,22 +61,22 @@ describe('attack', () => {
   });
   describe('calculateDamage', () => {
     it('returns 0 on missed attack.', () => {
-      const result = Attack.calculateDamage(attack, 'miss', roll(5), null);
+      const result = Attack.calculateDamage(attack, 'miss', roll(5), roll(10));
       expect(result.length).toEqual(0);
     });
     it('rolls half damage on missed save.', () => {
-      const result = Attack.calculateDamage(saveHalf, 'miss', roll(6), null);
+      const result = Attack.calculateDamage(saveHalf, 'miss', roll(6), roll(10));
       expect(result.length).toEqual(1);
       expect(result[0].amount).toEqual(3);
     });
   });
   describe('attackDamage', () => {
     it('should return nothing if they miss.', () => {
-      const result = Attack.attackDamage(attack, 'miss', roll(5), null);
+      const result = Attack.attackDamage(attack, 'miss', roll(5), roll(10));
       expect(result.length).toEqual(0);
     });
     it('should roll regular damage if they hit.', () => {
-      const result = Attack.attackDamage(attack, 'hit', roll(5), null);
+      const result = Attack.attackDamage(attack, 'hit', roll(5), roll(10));
       expect(result.length).toEqual(1);
       expect(result[0].amount).toEqual(5);
     });

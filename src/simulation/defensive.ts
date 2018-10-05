@@ -14,7 +14,7 @@ export const random: OffensiveStrategy = (current: Creature, encounter: Encounte
   const targets = allied(current, encounter);
   return {
     action: current.actions[encounter.random.numberBetween(0, current.actions.length - 1)],
-    targets: [targets[encounter.random.numberBetween(0, targets.length - 1)]]
+    targets: [targets[encounter.random.numberBetween(0, targets.length - 1)]].filter(t => t)
   };
 }
 
