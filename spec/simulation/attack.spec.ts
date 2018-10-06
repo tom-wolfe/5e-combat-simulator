@@ -129,7 +129,7 @@ describe('attack', () => {
       const damage: Damage[] = [
         { amount: 10, magical: false, type: 'bludgeoning' },
         { amount: 10, magical: true, type: 'slashing' }
-      ]
+      ];
       const result = Attack.totalDamage(damage, target);
       expect(result).toEqual(20);
     });
@@ -145,7 +145,7 @@ describe('attack', () => {
       const damage: Damage[] = [
         { amount: 10, type: 'bludgeoning' },
         { amount: 10, type: 'lightning' }
-      ]
+      ];
       const result = Attack.totalDamage(damage, target);
       expect(result).toEqual(15);
     });
@@ -153,14 +153,14 @@ describe('attack', () => {
       const damage: Damage[] = [
         { amount: 10, type: 'bludgeoning', },
         { amount: 10, type: 'piercing', magical: true }
-      ]
+      ];
       const result = Attack.totalDamage(damage, target);
       expect(result).toEqual(20);
 
       const damage2: Damage[] = [
         { amount: 10, type: 'bludgeoning', },
         { amount: 10, type: 'piercing', magical: false }
-      ]
+      ];
       const result2 = Attack.totalDamage(damage2, target);
       expect(result2).toEqual(15);
     });
