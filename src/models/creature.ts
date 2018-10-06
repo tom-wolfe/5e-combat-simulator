@@ -1,4 +1,4 @@
-import { Action } from '@sim/models/action';
+import { AbilityScores, Action } from '@sim/models';
 
 export type CreatureType = 'player' | 'monster';
 
@@ -11,4 +11,5 @@ export interface Creature {
   maxHp: number,
   initiativeMod: number;
   initiative?: number;
+  saves: AbilityScores;
 }

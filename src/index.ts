@@ -7,6 +7,7 @@ const dartagnan: Creature = {
   ac: 16,
   maxHp: 26,
   initiativeMod: -1,
+  saves: null,
   actions: [
     {
       name: 'Lux Aeterna',
@@ -26,6 +27,7 @@ const sebastian: Creature = {
   ac: 16,
   maxHp: 26,
   initiativeMod: -1,
+  saves: null,
   actions: [
     {
       name: 'Fire Bolt',
@@ -42,6 +44,7 @@ const patricia: Creature = {
   ac: 16,
   maxHp: 26,
   initiativeMod: -1,
+  saves: null,
   actions: [
     {
       name: 'Fire Bolt',
@@ -58,6 +61,7 @@ const neferi: Creature = {
   ac: 16,
   maxHp: 26,
   initiativeMod: -1,
+  saves: null,
   actions: [
     {
       name: 'Fire Bolt',
@@ -74,6 +78,7 @@ const vennris: Creature = {
   ac: 16,
   maxHp: 26,
   initiativeMod: -1,
+  saves: null,
   actions: [
     {
       name: 'Fire Bolt',
@@ -90,6 +95,7 @@ const monster: Creature = {
   ac: 16,
   maxHp: 200,
   initiativeMod: 3,
+  saves: null,
   actions: [
     {
       name: 'Unarmed Strike',

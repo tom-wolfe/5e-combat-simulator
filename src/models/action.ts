@@ -1,20 +1,21 @@
-import { Creature } from '@sim/models';
-
-export type Hit = 'hit' | 'miss' | 'crit';
-
-export interface Action {
-  name: string;
-  method: Method;
-  mod: number;
-  halfOnSuccess?: boolean;
-  damages: DamageRoll[];
-}
-
-export type Method = 'attack' | 'save';
+import { Ability, Creature } from '@sim/models';
 
 export type DamageType =
   'acid' | 'bludgeoning' | 'cold' | 'fire' | 'force' | 'lightning' | 'necrotic'
   | 'piercing' | 'poison' | 'psychic' | 'radiant' | 'slashing' | 'thunder';
+
+export type Hit = 'hit' | 'miss' | 'crit';
+
+export type Method = 'attack' | 'save';
+
+export interface Action {
+  name: string;
+  method: Method;
+  save?: Ability;
+  mod: number;
+  halfOnSuccess?: boolean;
+  damages: DamageRoll[];
+}
 
 export interface DamageRoll {
   dice?: string;

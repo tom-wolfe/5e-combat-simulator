@@ -19,8 +19,8 @@ export function toHit(action: Action, target: Models.Creature, roll: RollDice): 
 export function savingThrow(action: Models.Action, target: Models.Creature, roll: RollDice): Models.Hit {
   const d20 = roll('1d20');
   if (d20 === 20) { return 'miss'; };
-  // TODO: Add saving throw modifier.
-  return d20 >= (action.mod || 0) ? 'miss' : 'hit';
+  if (!action.save || !action.mod) { throw Error('Saving throw action requires a save ability and DC.'); }
+  return d20 + target.saves[action.save] >= action.mod ? 'miss' : 'hit';
 }
 
 export function calculateDamage(action: Models.Action, hit: Models.Hit, roll: RollDice, critical: CriticalStrategy): Damage[] {

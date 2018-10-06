@@ -4,10 +4,15 @@ import * as Attack from '@sim/simulation/attack';
 
 describe('attack', () => {
   const attack: Action = { name: '', method: 'attack', mod: 5, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }] };
-  const save: Action = { name: '', method: 'save', mod: 16, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }], halfOnSuccess: false };
-  const saveHalf: Action = { name: '', method: 'save', mod: 16, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }], halfOnSuccess: true };
+  const save: Action = {
+    name: '', method: 'save', save: 'wis', mod: 16, damages: [{ dice: '1d6', mod: 0, type: 'slashing' }], halfOnSuccess: false
+  };
+  const saveHalf: Action = {
+    name: '', method: 'save', save: 'wis', mod: 16, damages: [{ dice: '1d6', mod: 0, type: 'fire' }], halfOnSuccess: true
+  };
   const target: Creature = {
-    name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2
+    name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2,
+    saves: { str: 0, dex: 0, con: 0, int: 0, wis: 2, cha: 0 }
   };
   const roll = n => _ => n;
 
@@ -16,7 +21,6 @@ describe('attack', () => {
       const result = Attack.doesHit(attack, target, roll(5));
       expect(result).toEqual('miss');
     });
-
     it('rolls to save on a save.', () => {
       const result = Attack.doesHit(save, target, roll(5));
       expect(result).toEqual('hit');
@@ -45,7 +49,7 @@ describe('attack', () => {
       const result = Attack.savingThrow(save, target, roll(5));
       expect(result).toEqual('hit');
     });
-    it('should miss if they rolled AC or above.', () => {
+    it('should miss if they rolled DC or above.', () => {
       const result = Attack.savingThrow(save, target, roll(16));
       expect(result).toEqual('miss');
     });
@@ -53,11 +57,14 @@ describe('attack', () => {
       const result = Attack.savingThrow(save, target, roll(20));
       expect(result).toEqual('miss');
     });
-    // TODO: Add saving throw modifiers.
-    // it('should factor saving throw bonus.', () => {
-    //   const result = Attack.savingThrow(save, target, roll(11));
-    //   expect(result).toEqual('miss');
-    // });
+    it('should factor saving throw bonus.', () => {
+      const result = Attack.savingThrow(save, target, roll(14));
+      expect(result).toEqual('miss');
+    });
+    it('should throw if there is a missing ability.', () => {
+      const test: Action = { name: '', method: 'save', mod: 16, damages: [], halfOnSuccess: false };
+      expect(() => Attack.savingThrow(test, target, roll(1))).toThrow();
+    });
   });
   describe('calculateDamage', () => {
     it('returns 0 on missed attack.', () => {

@@ -4,10 +4,10 @@ import * as _ from 'lodash';
 
 const templateEncounter: Encounter = {
   creatures: [
-    { name: '1', type: 'player', ac: 10, actions: [], initiativeMod: 0, maxHp: 10 },
-    { name: '2', type: 'player', ac: 10, actions: [], initiativeMod: 1, maxHp: 10 },
-    { name: '3', type: 'player', ac: 10, actions: [], initiativeMod: 2, maxHp: 10 },
-    { name: '4', type: 'player', ac: 10, actions: [], initiativeMod: 3, maxHp: 10 }
+    { name: '1', type: 'player', ac: 10, actions: [], initiativeMod: 0, maxHp: 10, saves: null },
+    { name: '2', type: 'player', ac: 10, actions: [], initiativeMod: 1, maxHp: 10, saves: null },
+    { name: '3', type: 'player', ac: 10, actions: [], initiativeMod: 2, maxHp: 10, saves: null },
+    { name: '4', type: 'player', ac: 10, actions: [], initiativeMod: 3, maxHp: 10, saves: null }
   ]
 };
 
@@ -41,7 +41,7 @@ describe('simulator', () => {
   describe('dealDamage', () => {
     it('should reduce HP by the damage dealt.', () => {
       const target: Creature = {
-        name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2
+        name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2, saves: null
       };
       const simulator = new Simulator();
       simulator.dealDamage(target, [{ amount: 4, type: 'fire' }]);
@@ -52,9 +52,9 @@ describe('simulator', () => {
     it('should return undefined if there are no winners.', () => {
       const test: Encounter = {
         creatures: [
-          { name: '', type: 'player', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 10, initiativeMod: 2 },
-          { name: '', type: 'monster', ac: 14, actions: [], hp: 0, maxHp: 10, initiative: 15, initiativeMod: 2 },
-          { name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2 },
+          { name: '', type: 'player', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 10, initiativeMod: 2, saves: null },
+          { name: '', type: 'monster', ac: 14, actions: [], hp: 0, maxHp: 10, initiative: 15, initiativeMod: 2, saves: null },
+          { name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2, saves: null },
         ]
       };
       const simulator = new Simulator();
@@ -64,9 +64,9 @@ describe('simulator', () => {
     it('should return the correct winner.', () => {
       const test: Encounter = {
         creatures: [
-          { name: '', type: 'player', ac: 14, actions: [], hp: 0, maxHp: 10, initiative: 10, initiativeMod: 2 },
-          { name: '', type: 'monster', ac: 14, actions: [], hp: 0, maxHp: 10, initiative: 15, initiativeMod: 2 },
-          { name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2 },
+          { name: '', type: 'player', ac: 14, actions: [], hp: 0, maxHp: 10, initiative: 10, initiativeMod: 2, saves: null },
+          { name: '', type: 'monster', ac: 14, actions: [], hp: 0, maxHp: 10, initiative: 15, initiativeMod: 2, saves: null },
+          { name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2, saves: null },
         ]
       };
       const simulator = new Simulator();

@@ -3,10 +3,10 @@ import * as Offensive from '@sim/simulation/offensive';
 
 const encounter: Encounter = {
   creatures: [
-    { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'monster' },
-    { name: '', ac: 10, hp: 0, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'player' },
-    { name: '', ac: 10, hp: 8, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'player' },
-    { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'player' }
+    { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'monster', saves: null },
+    { name: '', ac: 10, hp: 0, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'player', saves: null },
+    { name: '', ac: 10, hp: 8, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'player', saves: null },
+    { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'player', saves: null }
   ]
 }
 
