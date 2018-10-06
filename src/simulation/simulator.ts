@@ -98,6 +98,8 @@ export class Simulator {
 
     // TODO: Take different action if it's defensive.
     this.attack(action.action, action.targets, encounter);
+
+    // TODO: Consume usage of action / spell slots.
   }
 
   attack(action: Action, targets: Creature[], encounter: Encounter) {

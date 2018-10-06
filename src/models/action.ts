@@ -16,6 +16,7 @@ export interface Action {
   halfOnSuccess?: boolean;
   damages: DamageRoll[];
 }
+// TODO: Add usage/spell slots.
 
 export interface DamageRoll {
   dice?: string;

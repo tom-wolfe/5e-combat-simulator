@@ -13,3 +13,5 @@ export interface Creature {
   initiative?: number;
   saves: AbilityScores;
 }
+
+// TODO: Add spell slots.

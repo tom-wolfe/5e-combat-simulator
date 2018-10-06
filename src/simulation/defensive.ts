@@ -1,19 +1,22 @@
 import { Creature, DefensiveStrategy, Encounter, OffensiveStrategy, TargettedAction } from '@sim/models';
 
 import { allied } from './targets';
+import * as Actions from './actions';
 
 export const first: DefensiveStrategy = (current: Creature, encounter: Encounter): TargettedAction => {
+  const actions = Actions.possibleActions(current);
   const targets = allied(current, encounter);
   return {
-    action: current.actions[0],
+    action: actions[0],
     targets: targets.slice(0, 1)
   };
 }
 
 export const random: OffensiveStrategy = (current: Creature, encounter: Encounter): TargettedAction => {
+  const actions = Actions.possibleActions(current);
   const targets = allied(current, encounter);
   return {
-    action: current.actions[encounter.random.numberBetween(0, current.actions.length - 1)],
+    action: actions[encounter.random.numberBetween(0, actions.length - 1)],
     targets: [targets[encounter.random.numberBetween(0, targets.length - 1)]].filter(t => t)
   };
 }
