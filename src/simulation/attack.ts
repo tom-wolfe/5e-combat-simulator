@@ -1,5 +1,5 @@
 import * as Models from '@sim/models';
-import { RollDice, DamageRoll, Action, Damage, CriticalStrategy } from '@sim/models';
+import { RollDice, DamageRoll, Action, Damage, CriticalStrategy, Creature } from '@sim/models';
 import * as _ from 'lodash';
 
 export function doesHit(action: Models.Action, target: Models.Creature, roll: RollDice): Models.Hit {
@@ -55,9 +55,20 @@ export function saveDamage(action: Models.Action, hit: Models.Hit, roll: RollDic
   }
 }
 
-export function totalDamage(damages: Damage[]): number {
-  if (damages.length === 0) { return 0; }
-  return _.sum(damages.map(d => d.amount))
+export function totalDamage(damages: Damage[], target: Creature): number {
+  const alterations = target.alterations || [];
+  return _.sum(damages.map(damage => {
+    const a = alterations.find(o => o.type === damage.type && (!o.mundaneOnly || !damage.magical));
+    if (!a) {
+      return damage.amount;
+    } else {
+      switch (a.alteration) {
+        case 'immune': return 0;
+        case 'resistant': return Math.floor(damage.amount / 2);
+        case 'vulnerable': return damage.amount * 2;
+      }
+    }
+  }));
 }
 
 function rollAllDamage(action: Models.Action, roll: RollDice, critical?: CriticalStrategy): Damage[] {

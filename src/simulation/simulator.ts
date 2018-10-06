@@ -106,14 +106,14 @@ export class Simulator {
     targets.forEach(target => {
       const hit = Attack.doesHit(action, target, encounter.roll);
       const damages = Attack.calculateDamage(action, hit, encounter.roll, encounter.critical);
-      this.log(`${action.name} ${hit} ${target.name} for ${Attack.totalDamage(damages)}.`);
+      this.log(`${action.name} ${hit} ${target.name} for ${Attack.totalDamage(damages, target)}.`);
 
       this.dealDamage(target, damages);
     });
   }
 
   dealDamage(target: Creature, damages: Damage[]) {
-    target.hp -= Attack.totalDamage(damages);
+    target.hp -= Attack.totalDamage(damages, target);
     this.log(`${target.name} has ${target.hp}/${target.maxHp}hp.`)
   }
 

@@ -12,6 +12,12 @@ describe('attack', () => {
   };
   const target: Creature = {
     name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2,
+    alterations: [
+      { alteration: 'immune', type: 'cold' },
+      { alteration: 'resistant', type: 'lightning' },
+      { alteration: 'vulnerable', type: 'psychic' },
+      { alteration: 'resistant', type: 'piercing', mundaneOnly: true }
+    ],
     saves: { str: 0, dex: 0, con: 0, int: 0, wis: 2, cha: 0 }
   };
   const roll = n => _ => n;
@@ -116,7 +122,7 @@ describe('attack', () => {
   });
   describe('totalDamage', () => {
     it('should return zero for empty damage.', () => {
-      const result = Attack.totalDamage([]);
+      const result = Attack.totalDamage([], target);
       expect(result).toBe(0);
     });
     it('should sum all damages.', () => {
@@ -124,8 +130,47 @@ describe('attack', () => {
         { amount: 10, magical: false, type: 'bludgeoning' },
         { amount: 10, magical: true, type: 'slashing' }
       ]
-      const result = Attack.totalDamage(damage);
+      const result = Attack.totalDamage(damage, target);
       expect(result).toEqual(20);
+    });
+    it('does not count immunities.', () => {
+      const damage: Damage[] = [
+        { amount: 10, type: 'bludgeoning' },
+        { amount: 10, type: 'cold' }
+      ]
+      const result = Attack.totalDamage(damage, target);
+      expect(result).toEqual(10);
+    });
+    it('halves damage resistances.', () => {
+      const damage: Damage[] = [
+        { amount: 10, type: 'bludgeoning' },
+        { amount: 10, type: 'lightning' }
+      ]
+      const result = Attack.totalDamage(damage, target);
+      expect(result).toEqual(15);
+    });
+    it('does not count non-magical resistances.', () => {
+      const damage: Damage[] = [
+        { amount: 10, type: 'bludgeoning', },
+        { amount: 10, type: 'piercing', magical: true }
+      ]
+      const result = Attack.totalDamage(damage, target);
+      expect(result).toEqual(20);
+
+      const damage2: Damage[] = [
+        { amount: 10, type: 'bludgeoning', },
+        { amount: 10, type: 'piercing', magical: false }
+      ]
+      const result2 = Attack.totalDamage(damage2, target);
+      expect(result2).toEqual(15);
+    });
+    it('doubles damage vulnerabilities.', () => {
+      const damage: Damage[] = [
+        { amount: 10, type: 'bludgeoning' },
+        { amount: 10, type: 'psychic' }
+      ]
+      const result = Attack.totalDamage(damage, target);
+      expect(result).toEqual(30);
     });
   });
 });
