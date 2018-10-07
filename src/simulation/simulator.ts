@@ -50,6 +50,7 @@ export class Simulator {
     let winner: CreatureType;
     let rounds = 0;
     while (!(winner = this.winner(round))) {
+      this.log(`Starting round ${rounds + 1}:`);
       this.round(round);
       rounds++;
     }
@@ -90,7 +91,11 @@ export class Simulator {
     const action = approach === 'offensive'
       ? encounter.offensive(creature, encounter)
       : encounter.defensive(creature, encounter);
-    if (action.targets.length === 0) { return; }
+
+    if (!action.action || action.targets.length === 0) {
+      this.log(`${creature.name} has no action/target!`);
+      return;
+    }
 
     this.log(`${creature.name} (${creature.hp}/${creature.maxHp}hp) is taking ${approach} action `
       + `against ${action.targets.map(t => t.name).join(', ')} `
@@ -98,8 +103,14 @@ export class Simulator {
 
     // TODO: Take different action if it's defensive.
     this.attack(action.action, action.targets, encounter);
+    this.consumeResource(action.action);
+  }
 
-    // TODO: Consume usage of action / spell slots.
+  consumeResource(action: Action) {
+    // TODO: Consume spell slots.
+    if (action.uses !== undefined) {
+      action.uses--;
+    }
   }
 
   attack(action: Action, targets: Creature[], encounter: Encounter) {

@@ -21,79 +21,79 @@ const dartagnan: Creature = {
   ],
 };
 
-const sebastian: Creature = {
-  name: 'Sebastian',
-  type: 'player',
-  ac: 16,
-  maxHp: 26,
-  initiativeMod: -1,
-  saves: null,
-  actions: [
-    {
-      name: 'Fire Bolt',
-      method: 'attack',
-      mod: 6,
-      damages: [{ dice: '1d8', type: 'fire', magical: true }]
-    }
-  ],
-};
+// const sebastian: Creature = {
+//   name: 'Sebastian',
+//   type: 'player',
+//   ac: 16,
+//   maxHp: 26,
+//   initiativeMod: -1,
+//   saves: null,
+//   actions: [
+//     {
+//       name: 'Fire Bolt',
+//       method: 'attack',
+//       mod: 6,
+//       damages: [{ dice: '1d8', type: 'fire', magical: true }]
+//     }
+//   ],
+// };
 
-const patricia: Creature = {
-  name: 'Patricia',
-  type: 'player',
-  ac: 16,
-  maxHp: 26,
-  initiativeMod: -1,
-  saves: null,
-  actions: [
-    {
-      name: 'Fire Bolt',
-      method: 'attack',
-      mod: 6,
-      damages: [{ dice: '1d8', type: 'fire', magical: true }]
-    }
-  ],
-};
+// const patricia: Creature = {
+//   name: 'Patricia',
+//   type: 'player',
+//   ac: 16,
+//   maxHp: 26,
+//   initiativeMod: -1,
+//   saves: null,
+//   actions: [
+//     {
+//       name: 'Fire Bolt',
+//       method: 'attack',
+//       mod: 6,
+//       damages: [{ dice: '1d8', type: 'fire', magical: true }]
+//     }
+//   ],
+// };
 
-const neferi: Creature = {
-  name: 'Neferi',
-  type: 'player',
-  ac: 16,
-  maxHp: 26,
-  initiativeMod: -1,
-  saves: null,
-  actions: [
-    {
-      name: 'Fire Bolt',
-      method: 'attack',
-      mod: 6,
-      damages: [{ dice: '1d8', type: 'fire', magical: true }]
-    }
-  ],
-};
+// const neferi: Creature = {
+//   name: 'Neferi',
+//   type: 'player',
+//   ac: 16,
+//   maxHp: 26,
+//   initiativeMod: -1,
+//   saves: null,
+//   actions: [
+//     {
+//       name: 'Fire Bolt',
+//       method: 'attack',
+//       mod: 6,
+//       damages: [{ dice: '1d8', type: 'fire', magical: true }]
+//     }
+//   ],
+// };
 
-const vennris: Creature = {
-  name: 'Vennris',
-  type: 'player',
-  ac: 16,
-  maxHp: 26,
-  initiativeMod: -1,
-  saves: null,
-  actions: [
-    {
-      name: 'Fire Bolt',
-      method: 'attack',
-      mod: 6,
-      damages: [{ dice: '1d8', type: 'fire', magical: true }]
-    }
-  ],
-};
+// const vennris: Creature = {
+//   name: 'Vennris',
+//   type: 'player',
+//   ac: 16,
+//   maxHp: 26,
+//   initiativeMod: -1,
+//   saves: null,
+//   actions: [
+//     {
+//       name: 'Fire Bolt',
+//       method: 'attack',
+//       mod: 6,
+//       damages: [{ dice: '1d8', type: 'fire', magical: true }]
+//     }
+//   ],
+// };
 
 const monster: Creature = {
   name: '???',
   type: 'monster',
   ac: 16,
-  maxHp: 200,
+  maxHp: 50,
   initiativeMod: 3,
   saves: null,
   actions: [
@@ -101,20 +101,22 @@ const monster: Creature = {
       name: 'Unarmed Strike',
       method: 'attack',
       mod: 7,
-      damages: [{ dice: '3d8', mod: 4, type: 'bludgeoning' }]
+      uses: 1,
+      damages: [{ dice: '1d8', mod: 4, type: 'bludgeoning' }]
     },
     {
       name: 'Bite',
       method: 'attack',
       mod: 7,
-      damages: [{ dice: '3d6', mod: 4, type: 'necrotic' }]
+      uses: 1,
+      damages: [{ dice: '1d6', mod: 4, type: 'necrotic' }]
     }
   ],
 };
 
-const battles = 100;
+const battles = 1;
 const encounter: Encounter = {
-  creatures: [dartagnan, sebastian, patricia, neferi, vennris, monster]
+  creatures: [dartagnan, /*sebastian, patricia, neferi, vennris,*/ monster]
 };
 
 const simulator = new Simulator();
