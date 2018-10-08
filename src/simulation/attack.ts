@@ -71,11 +71,11 @@ export function totalDamage(damages: Damage[], target: Creature): number {
   }));
 }
 
-function rollAllDamage(action: Models.Action, roll: RollDice, critical?: CriticalStrategy): Damage[] {
+export function rollAllDamage(action: Models.Action, roll: RollDice, critical?: CriticalStrategy): Damage[] {
   return action.damages.map(d => rollDamage(d, roll, critical));
 }
 
-function rollDamage(damage: DamageRoll, roll: RollDice, critical?: CriticalStrategy): Damage {
+export function rollDamage(damage: DamageRoll, roll: RollDice, critical?: CriticalStrategy): Damage {
   const dmg: Damage = {
     amount: critical ? critical(damage, roll) : normalDamage(damage, roll),
     type: damage.type,
@@ -84,7 +84,7 @@ function rollDamage(damage: DamageRoll, roll: RollDice, critical?: CriticalStrat
   return dmg;
 }
 
-function normalDamage(damage: DamageRoll, roll: RollDice): number {
+export function normalDamage(damage: DamageRoll, roll: RollDice): number {
   let amount = 0;
   if (damage.dice) { amount += (roll(damage.dice) || 0); }
   if (damage.mod) { amount += (damage.mod || 0); }

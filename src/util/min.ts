@@ -1,4 +1,4 @@
-export function min<T>(source: T[], p: (o: T) => number): T {
+export function min<T>(source: T[], p: (o: T) => number): { object: T, value: number } {
   let minValue: number, minObj: T;
   source.forEach(curObj => {
     const curVal = p(curObj);
@@ -8,5 +8,5 @@ export function min<T>(source: T[], p: (o: T) => number): T {
       minObj = curObj;
     }
   });
-  return minObj;
+  return { object: minObj, value: minValue };
 }

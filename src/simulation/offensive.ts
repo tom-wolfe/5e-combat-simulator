@@ -1,28 +1,54 @@
-import { Creature, Encounter, OffensiveStrategy, TargettedAction } from '@sim/models';
+import { Action, Creature, Encounter, OffensiveStrategy, TargettedAction } from '@sim/models';
+
 import * as Actions from './actions';
-import { opposing } from './targets';
+import * as Targets from './targets';
 
 export const first: OffensiveStrategy = (current: Creature, encounter: Encounter): TargettedAction => {
   const actions = Actions.possibleActions(current);
-  const targets = opposing(current, encounter).filter(c => c.hp > 0);
+  const targets = Targets.opposing(current, encounter).filter(c => c.hp > 0);
   return {
-    action: actions[0],
-    targets: targets.slice(0, 1)
+    action: Actions.first(actions, encounter),
+    targets: Targets.first(targets, encounter)
   };
 }
 
 export const random: OffensiveStrategy = (current: Creature, encounter: Encounter): TargettedAction => {
   const actions = Actions.possibleActions(current);
-  const targets = opposing(current, encounter).filter(c => c.hp > 0);
+  const targets = Targets.opposing(current, encounter).filter(c => c.hp > 0);
   return {
-    action: actions[encounter.random.numberBetween(0, actions.length - 1)],
-    targets: [targets[encounter.random.numberBetween(0, targets.length - 1)]].filter(t => t)
+    action: Actions.random(actions, encounter),
+    targets: Targets.random(targets, encounter, 1)
   };
 }
 
-// TODO: Reduce code duplication with the filter and the random selection
+export const mostDamageRandomTarget: OffensiveStrategy = (current: Creature, encounter: Encounter): TargettedAction => {
+  const actions = Actions.possibleActions(current);
+  const targets = Targets.opposing(current, encounter).filter(c => c.hp > 0);
+  return {
+    action: Actions.highestAverage(actions).action,
+    targets: Targets.random(targets, encounter, 1)
+  };
+}
 
-// TODO: Do the most damage
+export const smart: OffensiveStrategy = (current: Creature, encounter: Encounter): TargettedAction => {
+  const actions = Actions.possibleActions(current);
+  let targets = Targets.opposing(current, encounter).filter(c => c.hp > 0);
+
+  let action: Action;
+  const thingsItCanKill = Targets.canKill(actions, targets);
+  if (thingsItCanKill.length > 0) {
+    // If you can kill off something, do it with the least force. Prioritizing the thing that can hurt you the most.
+    targets = Targets.mostDangerous(thingsItCanKill);
+    action = Actions.leastForce(actions, targets);
+  } else {
+    // Otherwise, do the most damage to the strongest creature.
+    action = Actions.highestAverage(actions).action;
+    targets = Targets.mostDangerous(targets);
+  }
+
+  return { action, targets };
+}
+
 // TODO: Target the weakest creature.
 // TODO: Do the most damage to the strongest creature.
 // TODO: Kill off the strongest weak creature with a single hit, or do the most damage.

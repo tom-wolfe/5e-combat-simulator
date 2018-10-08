@@ -1,4 +1,4 @@
-export function max<T>(source: T[], p: (o: T) => number): T {
+export function max<T>(source: T[], p: (o: T) => number): { object: T, value: number } {
   let maxVal: number, maxObj: T;
   source.forEach(curObj => {
     const curVal = p(curObj);
@@ -8,5 +8,5 @@ export function max<T>(source: T[], p: (o: T) => number): T {
       maxObj = curObj;
     }
   });
-  return maxObj;
+  return { object: maxObj, value: maxVal };
 }

@@ -9,6 +9,6 @@ const targets = [
 describe('max', () => {
   it('should take the largest value.', () => {
     const m = max(targets, t => t.value);
-    expect(m).toBe(targets[1]);
+    expect(m.object).toBe(targets[1]);
   })
 });

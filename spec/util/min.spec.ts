@@ -9,6 +9,6 @@ const targets = [
 describe('min', () => {
   it('should take the smallest value.', () => {
     const m = min(targets, t => t.value);
-    expect(m).toBe(targets[2]);
+    expect(m.object).toBe(targets[2]);
   })
 });

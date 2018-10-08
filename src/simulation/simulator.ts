@@ -50,7 +50,7 @@ export class Simulator {
     let winner: CreatureType;
     let rounds = 0;
     while (!(winner = this.winner(round))) {
-      this.log(`Starting round ${rounds + 1}:`);
+      this.log(`Round ${rounds + 1}:`);
       this.round(round);
       rounds++;
     }
@@ -65,7 +65,7 @@ export class Simulator {
     encounter.approach = encounter.approach || Approach.offensive;
     encounter.critical = encounter.critical || Critical.rollTwice;
     encounter.defensive = encounter.defensive || Defensive.random;
-    encounter.offensive = encounter.offensive || Offensive.random;
+    encounter.offensive = encounter.offensive || Offensive.smart;
     encounter.random = encounter.random || new DefaultRandomProvider();
     if (!encounter.roll) {
       const dice = new Dice();
@@ -97,9 +97,10 @@ export class Simulator {
       return;
     }
 
-    this.log(`${creature.name} (${creature.hp}/${creature.maxHp}hp) is taking ${approach} action `
-      + `against ${action.targets.map(t => t.name).join(', ')} `
-      + `using ${action.action.name}.`);
+    this.log(`${creature.name} (${creature.hp}/${creature.maxHp}hp) ` +
+      `uses ${action.action.name} ` +
+      `against ${action.targets.map(t => t.name).join(', ')}.`
+    );
 
     // TODO: Take different action if it's defensive.
     this.attack(action.action, action.targets, encounter);
@@ -117,8 +118,7 @@ export class Simulator {
     targets.forEach(target => {
       const hit = Attack.doesHit(action, target, encounter.roll);
       const damages = Attack.calculateDamage(action, hit, encounter.roll, encounter.critical);
-      this.log(`${action.name} ${hit} ${target.name} for ${Attack.totalDamage(damages, target)}.`);
-
+      this.log(`${action.name} does ${Attack.totalDamage(damages, target)} damage (${hit}).`);
       this.dealDamage(target, damages);
     });
   }

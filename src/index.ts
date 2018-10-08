@@ -5,9 +5,9 @@ const dartagnan: Creature = {
   name: 'D\'artagnan',
   type: 'player',
   ac: 16,
-  maxHp: 26,
+  maxHp: 27,
   initiativeMod: -1,
-  saves: null,
+  saves: { str: 6, dex: 0, con: 4, int: 0, wis: -1, cha: 0 },
   actions: [
     {
       name: 'Lux Aeterna',
@@ -21,105 +21,115 @@ const dartagnan: Creature = {
   ],
 };
 
-// const sebastian: Creature = {
-//   name: 'Sebastian',
-//   type: 'player',
-//   ac: 16,
-//   maxHp: 26,
-//   initiativeMod: -1,
-//   saves: null,
-//   actions: [
-//     {
-//       name: 'Fire Bolt',
-//       method: 'attack',
-//       mod: 6,
-//       damages: [{ dice: '1d8', type: 'fire', magical: true }]
-//     }
-//   ],
-// };
+const sebastian: Creature = {
+  name: 'Sebastian',
+  type: 'player',
+  ac: 15,
+  maxHp: 27,
+  initiativeMod: 2,
+  saves: { str: 0, dex: 0, con: 4, int: 6, wis: 0, cha: 0 },
+  actions: [
+    {
+      name: 'Fire Bolt', method: 'attack', mod: 6,
+      damages: [{ dice: '1d8', type: 'fire', magical: true }]
+    }
+  ],
+};
 
-// const patricia: Creature = {
-//   name: 'Patricia',
-//   type: 'player',
-//   ac: 16,
-//   maxHp: 26,
-//   initiativeMod: -1,
-//   saves: null,
-//   actions: [
-//     {
-//       name: 'Fire Bolt',
-//       method: 'attack',
-//       mod: 6,
-//       damages: [{ dice: '1d8', type: 'fire', magical: true }]
-//     }
-//   ],
-// };
+const patricia: Creature = {
+  name: 'Patricia',
+  type: 'player',
+  ac: 13,
+  maxHp: 27,
+  initiativeMod: 2,
+  saves: { str: 6, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
+  actions: [
+    {
+      name: 'Fire Bolt', method: 'attack', mod: 6,
+      damages: [{ dice: '1d8', type: 'fire', magical: true }]
+    }
+  ],
+};
 
-// const neferi: Creature = {
-//   name: 'Neferi',
-//   type: 'player',
-//   ac: 16,
-//   maxHp: 26,
-//   initiativeMod: -1,
-//   saves: null,
-//   actions: [
-//     {
-//       name: 'Fire Bolt',
-//       method: 'attack',
-//       mod: 6,
-//       damages: [{ dice: '1d8', type: 'fire', magical: true }]
-//     }
-//   ],
-// };
+const neferi: Creature = {
+  name: 'Neferi',
+  type: 'player',
+  ac: 15,
+  maxHp: 27,
+  initiativeMod: 4,
+  saves: { str: 6, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
+  actions: [
+    {
+      name: 'Sneak Attack', method: 'attack', mod: 6,
+      damages: [
+        { dice: '1d8', type: 'bludgeoning' },
+        { dice: '2d6', type: 'bludgeoning' }
+      ]
+    }
+  ],
+};
 
-// const vennris: Creature = {
-//   name: 'Vennris',
-//   type: 'player',
-//   ac: 16,
-//   maxHp: 26,
-//   initiativeMod: -1,
-//   saves: null,
-//   actions: [
-//     {
-//       name: 'Fire Bolt',
-//       method: 'attack',
-//       mod: 6,
-//       damages: [{ dice: '1d8', type: 'fire', magical: true }]
-//     }
-//   ],
-// };
+const vennris: Creature = {
+  name: 'Vennris',
+  type: 'player',
+  ac: 14,
+  maxHp: 27,
+  initiativeMod: 3,
+  saves: { str: 6, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
+  actions: [
+    {
+      name: 'Fire Bolt', method: 'attack', mod: 6,
+      damages: [{ dice: '1d8', type: 'fire', magical: true }]
+    }
+  ],
+};
 
 const monster: Creature = {
   name: '???',
   type: 'monster',
   ac: 16,
-  maxHp: 50,
+  maxHp: 102,
   initiativeMod: 3,
-  saves: null,
+  alterations: [
+    { alteration: 'resistant', type: 'necrotic' },
+    { alteration: 'resistant', type: 'bludgeoning', mundaneOnly: true },
+    { alteration: 'resistant', type: 'piercing', mundaneOnly: true },
+    { alteration: 'resistant', type: 'slashing', mundaneOnly: true }
+  ],
+  saves: { str: 4, dex: 3, con: 4, int: 3, wis: 5, cha: 6 },
   actions: [
     {
-      name: 'Unarmed Strike',
-      method: 'attack',
-      mod: 7,
-      uses: 1,
-      damages: [{ dice: '1d8', mod: 4, type: 'bludgeoning' }]
+      name: 'Multiattack (Grapple / Bite)', method: 'attack', mod: 7,
+      damages: [
+        { dice: '1d6', mod: 4, type: 'piercing' },
+        { dice: '2d6', mod: 0, type: 'necrotic' }
+      ]
     },
     {
-      name: 'Bite',
-      method: 'attack',
-      mod: 7,
-      uses: 1,
-      damages: [{ dice: '1d6', mod: 4, type: 'necrotic' }]
+      name: 'Arms of Hadar',
+      method: 'save', save: 'str', mod: 15, halfOnSuccess: true, uses: 1,
+      damages: [{ dice: '4d6', mod: 0, type: 'cold' }]
+    },
+    {
+      name: 'Blight',
+      method: 'save', save: 'con', mod: 15, halfOnSuccess: true, uses: 1,
+      damages: [{ dice: '6d8', mod: 0, type: 'cold' }]
+    },
+    {
+      name: 'Shadow of Moil',
+      method: 'attack', mod: 999, uses: 2,
+      damages: [{ dice: '2d6', mod: 0, type: 'cold' }]
     }
   ],
 };
 
-const battles = 1;
+
 const encounter: Encounter = {
-  creatures: [dartagnan, /*sebastian, patricia, neferi, vennris,*/ monster]
+  creatures: [dartagnan, sebastian, patricia, neferi, vennris, monster]
 };
 
 const simulator = new Simulator();
+const battles = 1;
 simulator.log = console.log;
 const result = simulator.simulate(encounter, battles);
 

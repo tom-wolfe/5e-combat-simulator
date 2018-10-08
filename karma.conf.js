@@ -14,16 +14,16 @@ module.exports = function (config) {
       "**/*.ts": ["karma-typescript"],
     },
     reporters: ["progress", "karma-typescript"],
-    browsers: ["Chrome"],
+    browsers: ["chrome"],
     plugins: [
       "karma-chrome-launcher",
       "karma-jasmine",
       "karma-typescript"
     ],
     customLaunchers: {
-      chromeTravisCi: {
+      chrome: {
         base: "Chrome",
-        flags: ["--no-sandbox"]
+        flags: ["--no-sandbox", "--remote-debugging-port=9333"]
       }
     },
     karmaTypescriptConfig: {
