@@ -9,10 +9,17 @@ export interface Creature {
   actions: Action[];
   hp?: number;
   maxHp: number,
+  legendary?: Legendary;
   alterations?: DamageTypeAlteration[];
   initiativeMod: number;
   initiative?: number;
   saves: AbilityScores;
+}
+
+export interface Legendary {
+  resistances: number;
+  maxActions: number;
+  actions: number;
 }
 
 // TODO: Add spell slots.

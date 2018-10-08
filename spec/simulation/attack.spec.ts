@@ -72,54 +72,6 @@ describe('attack', () => {
       expect(() => Attack.savingThrow(test, target, roll(1))).toThrow();
     });
   });
-  describe('calculateDamage', () => {
-    it('returns 0 on missed attack.', () => {
-      const result = Attack.calculateDamage(attack, 'miss', roll(5), roll(10));
-      expect(result.length).toEqual(0);
-    });
-    it('rolls half damage on missed save.', () => {
-      const result = Attack.calculateDamage(saveHalf, 'miss', roll(6), roll(10));
-      expect(result.length).toEqual(1);
-      expect(result[0].amount).toEqual(3);
-    });
-  });
-  describe('attackDamage', () => {
-    it('should return nothing if they miss.', () => {
-      const result = Attack.attackDamage(attack, 'miss', roll(5), roll(10));
-      expect(result.length).toEqual(0);
-    });
-    it('should roll regular damage if they hit.', () => {
-      const result = Attack.attackDamage(attack, 'hit', roll(5), roll(10));
-      expect(result.length).toEqual(1);
-      expect(result[0].amount).toEqual(5);
-    });
-    it('should roll double damage if they crit.', () => {
-      const result = Attack.attackDamage(attack, 'crit', roll(5), roll(10));
-      expect(result.length).toEqual(1);
-      expect(result[0].amount).toEqual(10);
-    });
-  });
-  describe('saveDamage', () => {
-    it('should return nothing if they save and it\'s not half on save.', () => {
-      const result = Attack.saveDamage(save, 'miss', roll(5));
-      expect(result.length).toEqual(0);
-    });
-    it('should roll half damage if they save and it\'s half on save..', () => {
-      const result = Attack.saveDamage(saveHalf, 'miss', roll(6));
-      expect(result.length).toEqual(1);
-      expect(result[0].amount).toEqual(3);
-    });
-    it('should roll normal damage on hit.', () => {
-      const result = Attack.saveDamage(saveHalf, 'hit', roll(6));
-      expect(result.length).toEqual(1);
-      expect(result[0].amount).toEqual(6);
-    });
-    it('should roll normal damage on crit.', () => {
-      const result = Attack.saveDamage(saveHalf, 'crit', roll(6));
-      expect(result.length).toEqual(1);
-      expect(result[0].amount).toEqual(6);
-    });
-  });
   describe('totalDamage', () => {
     it('should return zero for empty damage.', () => {
       const result = Attack.totalDamage([], target);

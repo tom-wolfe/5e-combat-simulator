@@ -85,11 +85,16 @@ const vennris: Creature = {
 };
 
 const monster: Creature = {
-  name: '???',
+  name: 'Vampire',
   type: 'monster',
   ac: 16,
   maxHp: 102,
   initiativeMod: 3,
+  legendary: {
+    resistances: 3,
+    actions: 3,
+    maxActions: 3
+  },
   alterations: [
     { alteration: 'resistant', type: 'necrotic' },
     { alteration: 'resistant', type: 'bludgeoning', mundaneOnly: true },
@@ -100,6 +105,7 @@ const monster: Creature = {
   actions: [
     {
       name: 'Multiattack (Grapple / Bite)', method: 'attack', mod: 7,
+      legendary: 3,
       damages: [
         { dice: '1d6', mod: 4, type: 'piercing' },
         { dice: '2d6', mod: 0, type: 'necrotic' }

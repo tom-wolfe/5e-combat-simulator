@@ -6,9 +6,13 @@ import * as _ from 'lodash';
 
 import * as Attack from './attack';
 
-export function possibleActions(creature: Creature): Action[] {
+export function possibleActions(creature: Creature, legendary: boolean): Action[] {
   // TODO: Filter by spell slots.
-  return creature.actions.filter(c => c.uses === undefined || c.uses > 0);
+  let actions = creature.actions.filter(c => c.uses === undefined || c.uses > 0);
+  if (legendary) {
+    actions = actions.filter(a => a.legendary >= creature.legendary.actions);
+  }
+  return actions;
 }
 
 export function first(actions: Action[], encounter: Encounter): Action {
@@ -23,7 +27,7 @@ export function highestAverage(actions: Action[]): { action: Action, damage: num
   const avgProvider = new AverageProvider();
   const dice = new Dice(null, avgProvider);
   const avgRoll = input => dice.roll(input).total;
-  const result = max(actions, a => _.sum(Attack.rollAllDamage(a, avgRoll, null).map(d => d.amount)));
+  const result = max(actions, a => _.sum(Attack.rollAllDamage(a, avgRoll).map(d => d.amount)));
   return { action: result.object, damage: result.value };
 }
 
@@ -38,7 +42,7 @@ export function leastForce(actions: Action[], targets: Creature[]): Action {
   const dice = new Dice(null, avgProvider);
   const maxRoll = input => dice.roll(input).total;
 
-  const actionDamages = actions.map(a => ({ a, v: _.sum(Attack.rollAllDamage(a, maxRoll, null)) }));
+  const actionDamages = actions.map(a => ({ a, v: _.sum(Attack.rollAllDamage(a, maxRoll)) }));
 
   let damageVal = 0;
   // Try for the most powerful unlimited move.

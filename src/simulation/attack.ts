@@ -1,5 +1,5 @@
 import * as Models from '@sim/models';
-import { RollDice, DamageRoll, Action, Damage, CriticalStrategy, Creature } from '@sim/models';
+import { RollDice, DamageRoll, Action, Damage, DiceStrategy, Creature } from '@sim/models';
 import * as _ from 'lodash';
 
 export function doesHit(action: Models.Action, target: Models.Creature, roll: RollDice): Models.Hit {
@@ -23,38 +23,6 @@ export function savingThrow(action: Models.Action, target: Models.Creature, roll
   return d20 + target.saves[action.save] >= action.mod ? 'miss' : 'hit';
 }
 
-export function calculateDamage(action: Models.Action, hit: Models.Hit, roll: RollDice, critical: CriticalStrategy): Damage[] {
-  let damages: Damage[];
-  switch (action.method) {
-    case 'attack': damages = attackDamage(action, hit, roll, critical); break;
-    case 'save': damages = saveDamage(action, hit, roll); break;
-  }
-  return damages;
-}
-
-export function attackDamage(action: Models.Action, hit: Models.Hit, roll: RollDice, critical: CriticalStrategy): Damage[] {
-  let damages: Damage[] = [];
-  switch (hit) {
-    case 'hit': damages = rollAllDamage(action, roll, null); break;
-    case 'crit': damages = rollAllDamage(action, roll, critical); break;
-  }
-  return damages;
-}
-
-export function saveDamage(action: Models.Action, hit: Models.Hit, roll: RollDice): Damage[] {
-  if (hit === 'miss') {
-    if (action.halfOnSuccess) {
-      const damage = rollAllDamage(action, roll, null);
-      damage.forEach(d => d.amount = Math.floor(d.amount / 2));
-      return damage;
-    } else {
-      return [];
-    }
-  } else {
-    return rollAllDamage(action, roll, null);
-  }
-}
-
 export function totalDamage(damages: Damage[], target: Creature): number {
   const alterations = target.alterations || [];
   return _.sum(damages.map(damage => {
@@ -71,13 +39,13 @@ export function totalDamage(damages: Damage[], target: Creature): number {
   }));
 }
 
-export function rollAllDamage(action: Models.Action, roll: RollDice, critical?: CriticalStrategy): Damage[] {
-  return action.damages.map(d => rollDamage(d, roll, critical));
+export function rollAllDamage(action: Models.Action, roll: RollDice, modifier?: DiceStrategy): Damage[] {
+  return action.damages.map(d => rollDamage(d, roll, modifier));
 }
 
-export function rollDamage(damage: DamageRoll, roll: RollDice, critical?: CriticalStrategy): Damage {
+export function rollDamage(damage: DamageRoll, roll: RollDice, modifier?: DiceStrategy): Damage {
   const dmg: Damage = {
-    amount: critical ? critical(damage, roll) : normalDamage(damage, roll),
+    amount: (modifier || normalDamage)(damage, roll),
     type: damage.type,
     magical: !!damage.magical
   };

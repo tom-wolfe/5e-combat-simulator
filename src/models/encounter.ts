@@ -2,15 +2,15 @@ import { RandomProvider } from 'dice-typescript';
 
 import { Creature, CreatureType } from './creature';
 import { RollDice } from './dice';
-import { ApproachStrategy, CriticalStrategy, DefensiveStrategy, OffensiveStrategy } from './strategy';
+import { ActionStrategy, ApproachStrategy, DiceStrategy } from './strategy';
 
 export interface Encounter {
   random?: RandomProvider;
   roll?: RollDice;
   approach?: ApproachStrategy;
-  offensive?: OffensiveStrategy;
-  defensive?: DefensiveStrategy;
-  critical?: CriticalStrategy;
+  offensive?: ActionStrategy;
+  defensive?: ActionStrategy;
+  critical?: DiceStrategy;
   creatures: Creature[];
 }
 

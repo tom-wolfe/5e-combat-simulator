@@ -44,8 +44,16 @@ describe('simulator', () => {
         name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2, saves: null
       };
       const simulator = new Simulator();
-      simulator.dealDamage(target, [{ amount: 4, type: 'fire' }]);
+      simulator.dealDamage(target, [{ amount: 4, type: 'fire' }], false);
       expect(target.hp).toBe(6);
+    });
+    it('should reduce HP by half the damage dealt.', () => {
+      const target: Creature = {
+        name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2, saves: null
+      };
+      const simulator = new Simulator();
+      simulator.dealDamage(target, [{ amount: 5, type: 'fire' }], true);
+      expect(target.hp).toBe(8);
     });
   });
   describe('winner', () => {

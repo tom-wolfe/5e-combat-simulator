@@ -11,6 +11,7 @@ export type Method = 'attack' | 'save';
 export interface Action {
   name: string;
   method: Method;
+  legendary?: number;
   save?: Ability;
   mod: number;
   halfOnSuccess?: boolean;

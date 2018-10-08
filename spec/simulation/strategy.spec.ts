@@ -1,5 +1,5 @@
 import { Encounter } from '@sim/models';
-import * as Defensive from '@sim/simulation/defensive';
+import * as Strategy from '@sim/simulation/strategy';
 
 const encounter: Encounter = {
   creatures: [
@@ -10,12 +10,14 @@ const encounter: Encounter = {
   ]
 }
 
-describe('defensive', () => {
+describe('strategy', () => {
   describe('first', () => {
-    it('should take the first allied target.', () => {
-      const ta = Defensive.first(encounter.creatures[0], encounter);
+    it('should take the first target.', () => {
+      const creature = encounter.creatures[1];
+      const ta = Strategy.first(creature, creature.actions, encounter.creatures, null);
       expect(ta.targets.length).toBe(1);
       expect(ta.targets[0]).toBe(encounter.creatures[0]);
+      expect(ta.action).toBe(creature.actions[0]);
     })
   });
 });

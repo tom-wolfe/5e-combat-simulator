@@ -1,9 +1,10 @@
 import { Action, Creature, CreatureType, Damage, Encounter, EncounterResult } from '@sim/models';
 import { SimulationResult } from '@sim/models/simulation';
+import * as Actions from '@sim/simulation/actions';
+import * as Targets from '@sim/simulation/targets';
 import * as Approach from '@sim/simulation/approach';
 import * as Critical from '@sim/simulation/critical';
-import * as Defensive from '@sim/simulation/defensive';
-import * as Offensive from '@sim/simulation/offensive';
+import * as Strategy from '@sim/simulation/strategy';
 import { DefaultRandomProvider, Dice } from 'dice-typescript';
 import * as _ from 'lodash';
 
@@ -24,7 +25,7 @@ export class Simulator {
       simulationResult.survivors[c.name] = 0;
     });
 
-    this.log(`Running simulation ${battles} times.`);
+    this.log(`Running simulation ${battles} time(s).`);
     for (let x = 0; x < battles; x++) {
       const encounterResult = this.run(encounter);
 
@@ -64,8 +65,8 @@ export class Simulator {
   setDefaults(encounter: Encounter) {
     encounter.approach = encounter.approach || Approach.offensive;
     encounter.critical = encounter.critical || Critical.rollTwice;
-    encounter.defensive = encounter.defensive || Defensive.random;
-    encounter.offensive = encounter.offensive || Offensive.smart;
+    encounter.defensive = encounter.defensive || Strategy.random;
+    encounter.offensive = encounter.offensive || Strategy.smartOffense;
     encounter.random = encounter.random || new DefaultRandomProvider();
     if (!encounter.roll) {
       const dice = new Dice();
@@ -82,50 +83,131 @@ export class Simulator {
 
   round(encounter: Encounter) {
     this.turnOrder(encounter.creatures).forEach(c => {
-      if (c.hp > 0) { this.turn(c, encounter); }
+      if (c.hp > 0) {
+        this.resetLegendaryActions(c);
+        this.turn(c, encounter);
+        this.legendaryActions(c, encounter);
+      }
     });
   }
 
-  turn(creature: Creature, encounter: Encounter) {
+  legendaryActions(creature: Creature, encounter: Encounter) {
+    const legendary = encounter.creatures.filter(c => c.legendary && c !== creature && c.legendary.actions > 0);
+    if (legendary.length === 0) { return; }
+    legendary.forEach(c => {
+      this.log(`${c.name} is taking a legendary action!`);
+      this.turn(c, encounter, true);
+    })
+  }
+
+  resetLegendaryActions(creature: Creature) {
+    if (creature.legendary) {
+      if (creature.legendary.actions < creature.legendary.maxActions) {
+        this.log(`${creature.name} regains spent legendary actions!`);
+        creature.legendary.actions = creature.legendary.maxActions;
+      } else {
+        this.log(`${creature.name} has no legendary actions to regain.`);
+      }
+    }
+  }
+
+  turn(creature: Creature, encounter: Encounter, legendary: boolean = false) {
     const approach = encounter.approach(creature, encounter);
     const action = approach === 'offensive'
-      ? encounter.offensive(creature, encounter)
-      : encounter.defensive(creature, encounter);
+      ? this.offensive(creature, encounter, legendary)
+      : this.defensive(creature, encounter, legendary);
+    this.consumeResource(creature, action, legendary);
+  }
 
+  offensive(creature: Creature, encounter: Encounter, legendary: boolean = false): Action {
+    const actions = Actions.possibleActions(creature, legendary);
+    const targets = Targets.opposing(creature, encounter).filter(c => c.hp > 0);
+    const action = encounter.offensive(creature, actions, targets, encounter);
     if (!action.action || action.targets.length === 0) {
       this.log(`${creature.name} has no action/target!`);
       return;
     }
 
-    this.log(`${creature.name} (${creature.hp}/${creature.maxHp}hp) ` +
-      `uses ${action.action.name} ` +
-      `against ${action.targets.map(t => t.name).join(', ')}.`
-    );
-
     // TODO: Take different action if it's defensive.
-    this.attack(action.action, action.targets, encounter);
-    this.consumeResource(action.action);
-  }
-
-  consumeResource(action: Action) {
-    // TODO: Consume spell slots.
-    if (action.uses !== undefined) {
-      action.uses--;
+    if (action.action.method === 'attack') {
+      this.attack(creature, action.action, action.targets, encounter);
+    } else {
+      this.save(creature, action.action, action.targets, encounter);
     }
+    return action.action;
   }
 
-  attack(action: Action, targets: Creature[], encounter: Encounter) {
+  defensive(creature: Creature, encounter: Encounter, legendary: boolean = false): Action {
+    const actions = Actions.possibleActions(creature, legendary);
+    const targets = Targets.allied(creature, encounter);
+    const action = encounter.defensive(creature, actions, targets, encounter);
+    if (!action.action || action.targets.length === 0) {
+      this.log(`${creature.name} has no action/target!`);
+      return;
+    }
+
+    // TODO: Healing and stuff.
+    return action.action;
+  }
+
+  consumeResource(creature: Creature, action: Action, legendary: boolean) {
+    if (!action) { return; }
+    // TODO: Consume spell slots.
+    if (action.uses !== undefined) { action.uses--; }
+    if (legendary && action.legendary) { creature.legendary.actions -= action.legendary; }
+  }
+
+  attack(creature: Creature, action: Action, targets: Creature[], encounter: Encounter) {
     targets.forEach(target => {
       const hit = Attack.doesHit(action, target, encounter.roll);
-      const damages = Attack.calculateDamage(action, hit, encounter.roll, encounter.critical);
-      this.log(`${action.name} does ${Attack.totalDamage(damages, target)} damage (${hit}).`);
-      this.dealDamage(target, damages);
+      if (hit === 'miss') {
+        this.log(`${creature.name} (${creature.hp}/${creature.maxHp}hp) missed ${target.name} with ${action.name}.`);
+      } else {
+        const damages = Attack.rollAllDamage(action, encounter.roll, hit === 'crit' ? encounter.critical : null);
+        const damage = this.dealDamage(target, damages, false);
+        this.log(`${creature.name} (${creature.hp}/${creature.maxHp}hp) ${hit} ${target.name} with ${action.name} for ${damage} damage.`
+          + ` (${target.hp}hp remaining)`);
+      }
     });
   }
 
-  dealDamage(target: Creature, damages: Damage[]) {
-    target.hp -= Attack.totalDamage(damages, target);
-    this.log(`${target.name} has ${target.hp}/${target.maxHp}hp.`)
+  save(creature: Creature, action: Action, targets: Creature[], encounter: Encounter) {
+    const damages = Attack.rollAllDamage(action, encounter.roll);
+
+    let message = `${creature.name} uses ${action.name}.`;
+
+    targets.forEach(target => {
+      let hit = Attack.doesHit(action, target, encounter.roll);
+      message += ` ${target.name} `;
+      if (hit === 'miss') {
+        message += 'made the save, ';
+        // Made the save.
+      } else {
+        message += 'failed the save'
+        // Failed the save
+        if (target.legendary && target.legendary.resistances > 0) {
+          hit = 'miss';
+          target.legendary.resistances--;
+          // But chose to succeed. (remaining)
+          message += ` but chose to succeed ${target.legendary.resistances} resistances remaining, `;
+        } else {
+          message += ', ';
+        }
+      }
+
+      const damage = this.dealDamage(target, damages, true);
+
+      message += `taking ${damage || 'no'} damage. (${target.hp}hp remaining)`
+    });
+
+    this.log(message);
+  }
+
+  dealDamage(target: Creature, damages: Damage[], half: boolean): number {
+    let damage = Attack.totalDamage(damages, target);
+    if (half) { damage = Math.floor(damage / 2); }
+    target.hp -= damage;
+    return damage;
   }
 
   winner(encounter: Encounter): CreatureType {
