@@ -48,7 +48,3 @@ export const smart: OffensiveStrategy = (current: Creature, encounter: Encounter
 
   return { action, targets };
 }
-
-// TODO: Target the weakest creature.
-// TODO: Do the most damage to the strongest creature.
-// TODO: Kill off the strongest weak creature with a single hit, or do the most damage.
