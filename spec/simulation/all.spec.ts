@@ -95,6 +95,7 @@ const monster: Creature = {
     actions: 3,
     maxActions: 3
   },
+  regeneration: 10,
   alterations: [
     { alteration: 'resistant', type: 'necrotic' },
     { alteration: 'resistant', type: 'bludgeoning', mundaneOnly: true },

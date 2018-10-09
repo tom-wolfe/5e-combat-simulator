@@ -47,6 +47,5 @@ export function canKill(actions: Action[], targets: Creature[]): ActionForecast[
 }
 
 export function mostDangerous(targets: Creature[]): Creature[] {
-  // TODO: Factor resistances and stuff.
   return [max(targets, t => highestAverage(t.actions).damage).object].filter(t => t);
 }

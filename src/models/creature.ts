@@ -10,6 +10,7 @@ export interface Creature {
   hp?: number;
   maxHp: number,
   legendary?: Legendary;
+  regeneration?: number;
   alterations?: DamageTypeAlteration[];
   spellSlots?: SpellSlots
   initiativeMod: number;

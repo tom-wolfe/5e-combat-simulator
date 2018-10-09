@@ -85,6 +85,7 @@ export class Simulator {
     this.turnOrder(encounter.creatures).forEach(c => {
       if (c.hp > 0) {
         this.resetLegendaryActions(c);
+        this.regenerate(c);
         this.turn(c, encounter);
         this.legendaryActions(c, encounter);
       }
@@ -98,6 +99,12 @@ export class Simulator {
       this.log(`${c.name} is taking a legendary action!`);
       this.turn(c, encounter, true);
     })
+  }
+
+  regenerate(creature: Creature) {
+    if (!creature.regeneration) { return; }
+    this.log(`${creature.name} regains ${creature.regeneration} hit points!`);
+    creature.hp = Math.min(creature.hp + creature.regeneration, creature.maxHp);
   }
 
   resetLegendaryActions(creature: Creature) {
