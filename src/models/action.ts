@@ -17,8 +17,8 @@ export interface Action {
   halfOnSuccess?: boolean;
   damages: DamageRoll[];
   uses?: number;
+  spellLevel?: number;
 }
-// TODO: Add spell slots.
 
 export interface DamageRoll {
   dice?: string;
@@ -30,10 +30,17 @@ export interface DamageRoll {
 export interface TargettedAction {
   action: Action;
   targets: Creature[];
+  castLevel: number;
 }
 
 export interface Damage {
   amount: number;
   type: DamageType;
   magical?: boolean;
+}
+
+export interface ActionForecast {
+  action: Action;
+  target: Creature;
+  damage: number;
 }

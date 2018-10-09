@@ -1,4 +1,4 @@
-import { Action, Creature, CreatureType, Damage, Encounter, EncounterResult } from '@sim/models';
+import { Action, Creature, CreatureType, Damage, Encounter, EncounterResult, TargettedAction } from '@sim/models';
 import { SimulationResult } from '@sim/models/simulation';
 import * as Actions from '@sim/simulation/actions';
 import * as Targets from '@sim/simulation/targets';
@@ -119,7 +119,7 @@ export class Simulator {
     this.consumeResource(creature, action, legendary);
   }
 
-  offensive(creature: Creature, encounter: Encounter, legendary: boolean = false): Action {
+  offensive(creature: Creature, encounter: Encounter, legendary: boolean = false): TargettedAction {
     const actions = Actions.possibleActions(creature, legendary);
     const targets = Targets.opposing(creature, encounter).filter(c => c.hp > 0);
     const action = encounter.offensive(creature, actions, targets, encounter);
@@ -134,10 +134,10 @@ export class Simulator {
     } else {
       this.save(creature, action.action, action.targets, encounter);
     }
-    return action.action;
+    return action;
   }
 
-  defensive(creature: Creature, encounter: Encounter, legendary: boolean = false): Action {
+  defensive(creature: Creature, encounter: Encounter, legendary: boolean = false): TargettedAction {
     const actions = Actions.possibleActions(creature, legendary);
     const targets = Targets.allied(creature, encounter);
     const action = encounter.defensive(creature, actions, targets, encounter);
@@ -147,14 +147,14 @@ export class Simulator {
     }
 
     // TODO: Healing and stuff.
-    return action.action;
+    return action;
   }
 
-  consumeResource(creature: Creature, action: Action, legendary: boolean) {
+  consumeResource(creature: Creature, action: TargettedAction, legendary: boolean) {
     if (!action) { return; }
-    // TODO: Consume spell slots.
-    if (action.uses !== undefined) { action.uses--; }
-    if (legendary && action.legendary) { creature.legendary.actions -= action.legendary; }
+    if (action.action.uses !== undefined) { action.action.uses--; }
+    if (legendary && action.action.legendary) { creature.legendary.actions -= action.action.legendary; }
+    if (action.castLevel) { creature.spellSlots[action.castLevel]--; }
   }
 
   attack(creature: Creature, action: Action, targets: Creature[], encounter: Encounter) {

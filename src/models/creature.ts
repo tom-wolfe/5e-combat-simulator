@@ -11,6 +11,7 @@ export interface Creature {
   maxHp: number,
   legendary?: Legendary;
   alterations?: DamageTypeAlteration[];
+  spellSlots?: SpellSlots
   initiativeMod: number;
   initiative?: number;
   saves: AbilityScores;
@@ -22,12 +23,22 @@ export interface Legendary {
   actions: number;
 }
 
-// TODO: Add spell slots.
-
 export type DamageAlteration = 'resistant' | 'vulnerable' | 'immune';
 
 export interface DamageTypeAlteration {
   alteration: DamageAlteration;
   type: DamageType;
   mundaneOnly?: boolean;
+}
+
+export interface SpellSlots {
+  1?: number;
+  2?: number;
+  3?: number;
+  4?: number;
+  5?: number;
+  6?: number;
+  7?: number;
+  8?: number;
+  9?: number;
 }

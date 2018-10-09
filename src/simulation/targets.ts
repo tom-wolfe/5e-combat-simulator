@@ -1,6 +1,10 @@
-import { Action, Creature, Encounter } from '@sim/models';
+import { Action, Creature, Encounter, ActionForecast } from '@sim/models';
+import { AverageProvider } from '@sim/random/providers';
 import { highestAverage } from '@sim/simulation/actions';
 import { max } from '@sim/util';
+import { Dice } from 'dice-typescript';
+
+import * as Attack from './attack';
 
 export function allied(current: Creature, encounter: Encounter): Creature[] {
   return encounter.creatures.filter(c => c.type === current.type);
@@ -24,9 +28,22 @@ export function random(targets: Creature[], encounter: Encounter, count: number)
   return ret;
 }
 
-export function canKill(actions: Action[], targets: Creature[]): Creature[] {
-  const average = highestAverage(actions);
-  return targets.filter(t => t.hp <= average.damage);
+export function canKill(actions: Action[], targets: Creature[]): ActionForecast[] {
+  const data: ActionForecast[] = [];
+  const avgProvider = new AverageProvider();
+  const dice = new Dice(null, avgProvider);
+  const avgRoll = input => dice.roll(input).total;
+
+  // Work out how much damage each action will do to each creature
+  actions.forEach(action => {
+    targets.forEach(target => {
+      const avgDamage = Attack.rollAllDamage(action, avgRoll, null);
+      const damage = Attack.totalDamage(avgDamage, target);
+      data.push({ target, action, damage });
+    });
+  });
+
+  return data.filter(d => d.target.hp <= d.damage);
 }
 
 export function mostDangerous(targets: Creature[]): Creature[] {

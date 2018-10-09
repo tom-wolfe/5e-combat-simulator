@@ -1,14 +1,19 @@
 import { Action, Creature, Encounter } from '@sim/models';
 import { AverageProvider } from '@sim/random/providers';
-import { max } from '@sim/util';
+import { max, min } from '@sim/util';
 import { Dice } from 'dice-typescript';
 import * as _ from 'lodash';
 
 import * as Attack from './attack';
 
 export function possibleActions(creature: Creature, legendary: boolean): Action[] {
-  // TODO: Filter by spell slots.
   let actions = creature.actions.filter(c => c.uses === undefined || c.uses > 0);
+
+  if (creature.spellSlots) {
+    const highestSlot = _.max(Object.keys(creature.spellSlots).filter(level => creature.spellSlots[level] > 0).map(Number));
+    actions = actions.filter(a => a.spellLevel === undefined || a.spellLevel <= highestSlot);
+  }
+
   if (legendary) {
     actions = actions.filter(a => a.legendary >= creature.legendary.actions);
   }
@@ -32,8 +37,7 @@ export function highestAverage(actions: Action[]): { action: Action, damage: num
 }
 
 export function unlimited(action: Action): boolean {
-  // TODO: Check spell slots.
-  return action.uses === undefined;
+  return action.uses === undefined && action.spellLevel === undefined;
 }
 
 export function leastForce(actions: Action[], targets: Creature[]): Action {
@@ -44,20 +48,19 @@ export function leastForce(actions: Action[], targets: Creature[]): Action {
 
   const actionDamages = actions.map(a => ({ a, v: _.sum(Attack.rollAllDamage(a, maxRoll)) }));
 
-  let damageVal = 0;
   // Try for the most powerful unlimited move.
-  damageVal = _.max(actionDamages.filter(a => unlimited(a.a)).map(a => a.v));
+  let action = max(actionDamages.filter(a => unlimited(a.a)), a => a.v);
 
   // If not, try for the least powerful limited move.
-  if (damageVal < maxHp) {
-    damageVal = _.min(actionDamages.filter(a => !unlimited(a.a) && a.v >= maxHp).map(a => a.v)) || 0;
+  if (action.value < maxHp) {
+    action = min(actionDamages.filter(a => !unlimited(a.a) && a.v >= maxHp), a => a.v);
   }
 
   // Neither of those work, so just use the strongest action.
-  if (damageVal === 0) {
-    damageVal = _.max(actionDamages.map(a => a.v));
+  if (!action.object) {
+    action = max(actionDamages, a => a.v);
   }
 
-  return actionDamages.find(a => a.v === damageVal).a;
+  return action.object.a;
 }
 
