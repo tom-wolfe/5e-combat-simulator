@@ -1,10 +1,10 @@
-import { Action, ActionStrategy, Creature } from '@sim/models';
+import { Action, ActionStrategy, CreatureModel} from '@sim/models';
 import * as _ from 'lodash';
 
 import * as Actions from './actions';
 import * as Targets from './targets';
 
-function lowestCastLevel(creature: Creature, action: Action): number {
+function lowestCastLevel(creature: CreatureModel, action: Action): number {
   if (!action || !action.spellLevel) { return 0; }
   const possibleLevels = Object.keys(creature.spellSlots)
     .filter(level => creature.spellSlots[level] > 0)

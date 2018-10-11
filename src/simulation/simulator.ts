@@ -1,4 +1,4 @@
-import { Action, Creature, CreatureType, Damage, Encounter, EncounterResult, TargettedAction } from '@sim/models';
+import { Action, CreatureModel, CreatureType, Damage, EncounterModel, EncounterResult, TargetedAction } from '@sim/models';
 import { SimulationResult } from '@sim/models/simulation';
 import * as Actions from '@sim/simulation/actions';
 import * as Targets from '@sim/simulation/targets';
@@ -13,7 +13,7 @@ import * as Attack from './attack';
 export class Simulator {
   log: (message: string) => void = _message => { };
 
-  simulate(encounter: Encounter, battles: number): SimulationResult {
+  simulate(encounter: EncounterModel, battles: number): SimulationResult {
     const simulationResult: SimulationResult = {
       battles,
       wins: { monster: 0, player: 0 },
@@ -43,7 +43,7 @@ export class Simulator {
     return simulationResult;
   }
 
-  run(encounter: Encounter): EncounterResult {
+  run(encounter: EncounterModel): EncounterResult {
     const round = _.cloneDeep(encounter);
     this.setDefaults(round);
     this.begin(round);
@@ -62,7 +62,7 @@ export class Simulator {
     };
   }
 
-  setDefaults(encounter: Encounter) {
+  setDefaults(encounter: EncounterModel) {
     encounter.approach = encounter.approach || Approach.offensive;
     encounter.critical = encounter.critical || Critical.rollTwice;
     encounter.defensive = encounter.defensive || Strategy.random;
@@ -74,14 +74,14 @@ export class Simulator {
     }
   }
 
-  begin(encounter: Encounter) {
+  begin(encounter: EncounterModel) {
     encounter.creatures.forEach(c => {
       if (c.hp === undefined) { c.hp = c.maxHp; }
       if (c.initiative === undefined) { c.initiative = encounter.roll('1d20') + c.initiativeMod; }
     });
   }
 
-  round(encounter: Encounter) {
+  round(encounter: EncounterModel) {
     this.turnOrder(encounter.creatures).forEach(c => {
       if (c.hp > 0) {
         this.resetLegendaryActions(c);
@@ -92,7 +92,7 @@ export class Simulator {
     });
   }
 
-  legendaryActions(creature: Creature, encounter: Encounter) {
+  legendaryActions(creature: CreatureModel, encounter: EncounterModel) {
     const legendary = encounter.creatures.filter(c => c.legendary && c !== creature && c.legendary.actions > 0);
     if (legendary.length === 0) { return; }
     legendary.forEach(c => {
@@ -101,13 +101,13 @@ export class Simulator {
     })
   }
 
-  regenerate(creature: Creature) {
+  regenerate(creature: CreatureModel) {
     if (!creature.regeneration) { return; }
     this.log(`${creature.name} regains ${creature.regeneration} hit points!`);
     creature.hp = Math.min(creature.hp + creature.regeneration, creature.maxHp);
   }
 
-  resetLegendaryActions(creature: Creature) {
+  resetLegendaryActions(creature: CreatureModel) {
     if (creature.legendary) {
       if (creature.legendary.actions < creature.legendary.maxActions) {
         this.log(`${creature.name} regains spent legendary actions!`);
@@ -118,7 +118,7 @@ export class Simulator {
     }
   }
 
-  turn(creature: Creature, encounter: Encounter, legendary: boolean = false) {
+  turn(creature: CreatureModel, encounter: EncounterModel, legendary: boolean = false) {
     const approach = encounter.approach(creature, encounter);
     const action = approach === 'offensive'
       ? this.offensive(creature, encounter, legendary)
@@ -126,7 +126,7 @@ export class Simulator {
     this.consumeResource(creature, action, legendary);
   }
 
-  offensive(creature: Creature, encounter: Encounter, legendary: boolean = false): TargettedAction {
+  offensive(creature: CreatureModel, encounter: EncounterModel, legendary: boolean = false): TargetedAction {
     const actions = Actions.possibleActions(creature, legendary);
     const targets = Targets.opposing(creature, encounter).filter(c => c.hp > 0);
     const action = encounter.offensive(creature, actions, targets, encounter);
@@ -144,7 +144,7 @@ export class Simulator {
     return action;
   }
 
-  defensive(creature: Creature, encounter: Encounter, legendary: boolean = false): TargettedAction {
+  defensive(creature: CreatureModel, encounter: EncounterModel, legendary: boolean = false): TargetedAction {
     const actions = Actions.possibleActions(creature, legendary);
     const targets = Targets.allied(creature, encounter);
     const action = encounter.defensive(creature, actions, targets, encounter);
@@ -157,14 +157,14 @@ export class Simulator {
     return action;
   }
 
-  consumeResource(creature: Creature, action: TargettedAction, legendary: boolean) {
+  consumeResource(creature: CreatureModel, action: TargetedAction, legendary: boolean) {
     if (!action) { return; }
     if (action.action.uses !== undefined) { action.action.uses--; }
     if (legendary && action.action.legendary) { creature.legendary.actions -= action.action.legendary; }
     if (action.castLevel) { creature.spellSlots[action.castLevel]--; }
   }
 
-  attack(creature: Creature, action: Action, targets: Creature[], encounter: Encounter) {
+  attack(creature: CreatureModel, action: Action, targets: CreatureModel[], encounter: EncounterModel) {
     targets.forEach(target => {
       const hit = Attack.doesHit(action, target, encounter.roll);
       if (hit === 'miss') {
@@ -178,7 +178,7 @@ export class Simulator {
     });
   }
 
-  save(creature: Creature, action: Action, targets: Creature[], encounter: Encounter) {
+  save(creature: CreatureModel, action: Action, targets: CreatureModel[], encounter: EncounterModel) {
     const damages = Attack.rollAllDamage(action, encounter.roll);
 
     let message = `${creature.name} uses ${action.name}.`;
@@ -210,20 +210,20 @@ export class Simulator {
     this.log(message);
   }
 
-  dealDamage(target: Creature, damages: Damage[], half: boolean): number {
+  dealDamage(target: CreatureModel, damages: Damage[], half: boolean): number {
     let damage = Attack.totalDamage(damages, target);
     if (half) { damage = Math.floor(damage / 2); }
     target.hp -= damage;
     return damage;
   }
 
-  winner(encounter: Encounter): CreatureType {
+  winner(encounter: EncounterModel): CreatureType {
     if (encounter.creatures.filter(c => c.type === 'player' && c.hp > 0).length === 0) { return 'monster'; }
     if (encounter.creatures.filter(c => c.type === 'monster' && c.hp > 0).length === 0) { return 'player'; }
     return undefined;
   }
 
-  turnOrder(creatures: Creature[]): Creature[] {
+  turnOrder(creatures: CreatureModel[]): CreatureModel[] {
     return _.orderBy(creatures, c => c.initiative, 'desc');
   }
 }

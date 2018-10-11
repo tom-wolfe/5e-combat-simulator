@@ -2,7 +2,7 @@ import { AbilityScores, Action, DamageType } from '@sim/models';
 
 export type CreatureType = 'player' | 'monster';
 
-export interface Creature {
+export interface CreatureModel {
   name: string,
   type: CreatureType,
   ac: number,

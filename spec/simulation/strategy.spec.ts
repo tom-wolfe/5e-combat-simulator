@@ -1,7 +1,7 @@
-import { Encounter } from '@sim/models';
+import { EncounterModel } from '@sim/models';
 import * as Strategy from '@sim/simulation/strategy';
 
-const encounter: Encounter = {
+const encounter: EncounterModel = {
   creatures: [
     { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'monster', saves: null },
     { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'player', saves: null },

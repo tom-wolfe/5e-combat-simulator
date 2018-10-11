@@ -1,7 +1,7 @@
-import { Creature, Encounter } from '@sim/models';
+import { CreatureModel, EncounterModel } from '@sim/models';
 import { Approach, ApproachStrategy } from '@sim/models/strategy';
 
-export const offensive: ApproachStrategy = (current: Creature, encounter: Encounter): Approach => {
+export const offensive: ApproachStrategy = (current: CreatureModel, encounter: EncounterModel): Approach => {
   return 'offensive';
 }
 

@@ -1,7 +1,7 @@
-import { Creature, Encounter } from '@sim/models';
+import { CreatureModel, EncounterModel } from '@sim/models';
 import { Simulator } from '@sim/simulation/simulator';
 
-const dartagnan: Creature = {
+const dartagnan: CreatureModel = {
   name: 'D\'artagnan',
   type: 'player',
   ac: 16,
@@ -21,7 +21,7 @@ const dartagnan: Creature = {
   ],
 };
 
-const sebastian: Creature = {
+const sebastian: CreatureModel = {
   name: 'Sebastian',
   type: 'player',
   ac: 15,
@@ -36,7 +36,7 @@ const sebastian: Creature = {
   ],
 };
 
-const patricia: Creature = {
+const patricia: CreatureModel = {
   name: 'Patricia',
   type: 'player',
   ac: 13,
@@ -51,7 +51,7 @@ const patricia: Creature = {
   ],
 };
 
-const neferi: Creature = {
+const neferi: CreatureModel = {
   name: 'Neferi',
   type: 'player',
   ac: 15,
@@ -69,7 +69,7 @@ const neferi: Creature = {
   ],
 };
 
-const vennris: Creature = {
+const vennris: CreatureModel = {
   name: 'Vennris',
   type: 'player',
   ac: 14,
@@ -84,7 +84,7 @@ const vennris: Creature = {
   ],
 };
 
-const monster: Creature = {
+const monster: CreatureModel = {
   name: 'Vampire',
   type: 'monster',
   ac: 16,
@@ -130,7 +130,7 @@ const monster: Creature = {
   ],
 };
 
-const encounter: Encounter = {
+const encounter: EncounterModel = {
   creatures: [dartagnan, sebastian, patricia, neferi, vennris, monster]
 };
 

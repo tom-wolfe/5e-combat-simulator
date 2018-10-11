@@ -1,5 +1,5 @@
 import { Action, Damage } from '@sim/models';
-import { Creature } from '@sim/models/creature';
+import { CreatureModel } from '@sim/models/creature';
 import * as Attack from '@sim/simulation/attack';
 
 describe('attack', () => {
@@ -10,7 +10,7 @@ describe('attack', () => {
   const saveHalf: Action = {
     name: '', method: 'save', save: 'wis', mod: 16, damages: [{ dice: '1d6', mod: 0, type: 'fire' }], halfOnSuccess: true
   };
-  const target: Creature = {
+  const target: CreatureModel = {
     name: '', type: 'monster', ac: 14, actions: [], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2,
     alterations: [
       { alteration: 'immune', type: 'cold' },

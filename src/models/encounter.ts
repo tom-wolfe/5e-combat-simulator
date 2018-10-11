@@ -1,17 +1,17 @@
 import { RandomProvider } from 'dice-typescript';
 
-import { Creature, CreatureType } from './creature';
+import { CreatureModel, CreatureType } from './creature';
 import { RollDice } from './dice';
 import { ActionStrategy, ApproachStrategy, DiceStrategy } from './strategy';
 
-export interface Encounter {
+export interface EncounterModel {
   random?: RandomProvider;
   roll?: RollDice;
   approach?: ApproachStrategy;
   offensive?: ActionStrategy;
   defensive?: ActionStrategy;
   critical?: DiceStrategy;
-  creatures: Creature[];
+  creatures: CreatureModel[];
 }
 
 export interface EncounterResult {

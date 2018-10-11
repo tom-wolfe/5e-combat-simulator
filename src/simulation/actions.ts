@@ -1,4 +1,4 @@
-import { Action, Creature, Encounter } from '@sim/models';
+import { Action, CreatureModel, EncounterModel} from '@sim/models';
 import { AverageProvider } from '@sim/random/providers';
 import { max, min } from '@sim/util';
 import { Dice } from 'dice-typescript';
@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 
 import * as Attack from './attack';
 
-export function possibleActions(creature: Creature, legendary: boolean): Action[] {
+export function possibleActions(creature: CreatureModel, legendary: boolean): Action[] {
   let actions = creature.actions.filter(c => c.uses === undefined || c.uses > 0);
 
   if (creature.spellSlots) {
@@ -20,11 +20,11 @@ export function possibleActions(creature: Creature, legendary: boolean): Action[
   return actions;
 }
 
-export function first(actions: Action[], encounter: Encounter): Action {
+export function first(actions: Action[], encounter: EncounterModel): Action {
   return actions[0];
 }
 
-export function random(actions: Action[], encounter: Encounter): Action {
+export function random(actions: Action[], encounter: EncounterModel): Action {
   return actions[encounter.random.numberBetween(0, actions.length - 1)]
 }
 
@@ -40,7 +40,7 @@ export function unlimited(action: Action): boolean {
   return action.uses === undefined && action.spellLevel === undefined;
 }
 
-export function leastForce(actions: Action[], targets: Creature[]): Action {
+export function leastForce(actions: Action[], targets: CreatureModel[]): Action {
   const maxHp = _.max(targets.map(t => t.hp));
   const avgProvider = new AverageProvider();
   const dice = new Dice(null, avgProvider);

@@ -1,7 +1,7 @@
-import { Creature } from '@sim/models';
+import { CreatureModel } from '@sim/models';
 import * as Actions from '@sim/simulation/actions';
 
-const creature: Creature = {
+const creature: CreatureModel = {
   name: '', type: 'monster', ac: 14, actions: [
     { name: '', method: 'attack', mod: 10, damages: [], uses: 0 },
     { name: '', method: 'attack', mod: 10, damages: [] },
