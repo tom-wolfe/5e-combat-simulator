@@ -1,7 +1,7 @@
-import { EncounterModel } from '@sim/models';
+import { EncounterStrategy } from '@sim/models';
 
 export class Encounter {
-  constructor(model: EncounterModel) {
+  constructor(strategy: EncounterStrategy) {
 
   }
 }

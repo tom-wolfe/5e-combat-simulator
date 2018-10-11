@@ -1,4 +1,5 @@
-import { Ability, CreatureModel } from '@sim/models';
+import { Ability } from '@sim/models';
+import { Creature } from '@sim/simulation/creature';
 
 export type DamageType =
   'acid' | 'bludgeoning' | 'cold' | 'fire' | 'force' | 'lightning' | 'necrotic'
@@ -29,7 +30,7 @@ export interface DamageRoll {
 
 export interface TargetedAction {
   action: Action;
-  targets: CreatureModel[];
+  targets: Creature[];
   castLevel: number;
 }
 
@@ -41,6 +42,6 @@ export interface Damage {
 
 export interface ActionForecast {
   action: Action;
-  target: CreatureModel
+  target: Creature;
   damage: number;
 }

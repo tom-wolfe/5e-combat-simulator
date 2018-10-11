@@ -12,7 +12,7 @@ export interface CreatureModel {
   legendary?: Legendary;
   regeneration?: number;
   alterations?: DamageTypeAlteration[];
-  spellSlots?: SpellSlots
+  spellSlots?: SpellSlots;
   initiativeMod: number;
   initiative?: number;
   saves: AbilityScores;
@@ -20,7 +20,6 @@ export interface CreatureModel {
 
 export interface Legendary {
   resistances: number;
-  maxActions: number;
   actions: number;
 }
 

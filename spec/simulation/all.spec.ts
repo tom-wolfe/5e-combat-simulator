@@ -1,4 +1,4 @@
-import { CreatureModel, EncounterModel } from '@sim/models';
+import { CreatureModel } from '@sim/models';
 import { Simulator } from '@sim/simulation/simulator';
 
 const dartagnan: CreatureModel = {
@@ -93,7 +93,6 @@ const monster: CreatureModel = {
   legendary: {
     resistances: 3,
     actions: 3,
-    maxActions: 3
   },
   regeneration: 10,
   alterations: [
@@ -130,16 +129,13 @@ const monster: CreatureModel = {
   ],
 };
 
-const encounter: EncounterModel = {
-  creatures: [dartagnan, sebastian, patricia, neferi, vennris, monster]
-};
+const creatures: CreatureModel[] = [dartagnan, sebastian, patricia, neferi, vennris, monster];
 
 describe('ALL', () => {
   it('runs without error.', () => {
     const simulator = new Simulator();
     const battles = 1000;
-    // simulator.log = console.log;
-    const result = simulator.simulate(encounter, battles);
+    const result = simulator.simulate(creatures, battles);
 
     const success = result.wins.player / battles * 100;
     let message = '\n';
