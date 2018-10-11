@@ -3,8 +3,11 @@ import * as Actions from '@sim/simulation/actions';
 import * as Attack from '@sim/simulation/attack';
 import * as Targets from '@sim/simulation/targets';
 import * as _ from 'lodash';
+import { Encounter } from './encounter';
 
 export class Creature {
+  private encounter: Encounter;
+
   ac: number;
   name: string;
   hp: number;
@@ -24,14 +27,20 @@ export class Creature {
     this.actions = [...model.actions];
   }
 
-  rollInitiative(roll: Models.RollDice) {
-    this.initiative = roll('1d20') + this.model.initiativeMod;
+  setEncounter(encounter: Encounter) {
+    if (this.encounter) { throw Error('This creature has already been assigned to an encounter!'); }
+    this.encounter = encounter;
+  }
+
+  rollInitiative() {
+    this.initiative = this.encounter.strategy.roll('1d20') + this.model.initiativeMod;
   }
 
   takeDamage(damages: Models.Damage[], half: boolean) {
     let damage = this.totalDamage(damages);
     if (half) { damage = Math.floor(damage / 2); }
     this.hp -= damage;
+    console.log(this.hp);
   }
 
   totalDamage(damages: Models.Damage[]): number {
@@ -50,61 +59,62 @@ export class Creature {
     }));
   }
 
-  turn(strategy: Models.EncounterStrategy, creatures: Creature[], legendary: boolean = false) {
+  turn(legendary: boolean = false) {
     this.regenerate();
     this.resetLegendaryActions();
 
-    const approach = strategy.approach(this, strategy);
+    const approach = this.encounter.strategy.approach(this, this.encounter.strategy);
     const action = approach === 'offensive'
-      ? this.offensive(strategy, creatures, legendary)
-      : this.defensive(strategy, creatures, legendary);
+      ? this.offensive(legendary)
+      : this.defensive(legendary);
     this.consumeResource(action, legendary);
   }
 
-  makeSave(save: Models.Ability, dc: number, roll: Models.RollDice): Models.Hit {
-    const d20 = roll('1d20');
+  makeSave(save: Models.Ability, dc: number): Models.Hit {
+    const d20 = this.encounter.strategy.roll('1d20');
     if (d20 === 20) { return 'miss'; };
     if (!save || !dc) { throw Error('Saving throw action requires a save ability and DC.'); }
     return d20 + this.model.saves[save] >= dc ? 'miss' : 'hit';
   }
 
-  private offensive(strategy: Models.EncounterStrategy, creatures: Creature[], legendary: boolean = false): Models.TargetedAction {
+  private offensive(legendary: boolean = false): Models.TargetedAction {
     const actions = Actions.possibleActions(this, legendary);
-    const targets = Targets.opposing(this, creatures).filter(c => c.hp > 0);
-    const action = strategy.offensive(this, actions, targets, strategy);
+    const targets = Targets.opposing(this, this.encounter.creatures).filter(c => c.hp > 0);
+    const action = this.encounter.strategy.offensive(this, actions, targets, this.encounter.strategy);
     if (!action.action || action.targets.length === 0) {
       return;
     }
     if (action.action.method === 'attack') {
-      this.attack(strategy, action.action, action.targets);
+      this.attack(action.action, action.targets);
     } else {
-      this.save(strategy, action.action, action.targets);
+      this.save(action.action, action.targets);
     }
     return action;
   }
 
-  private defensive(strategy: Models.EncounterStrategy, creatures: Creature[], legendary: boolean = false): Models.TargetedAction {
+  private defensive(legendary: boolean = false): Models.TargetedAction {
     // TODO: Implement defensive action.
     throw Error('Defensive action not implemented!');
   }
 
-  private attack(strategy: Models.EncounterStrategy, action: Models.Action, targets: Creature[]) {
+  private attack(action: Models.Action, targets: Creature[]) {
     targets.forEach(target => {
-      const hit = Attack.doesHit(action, target, strategy.roll);
-      if (hit === 'miss') {
-
-      } else {
-        const damages = Attack.rollAllDamage(action, strategy.roll, hit === 'crit' ? strategy.critical : null);
+      const hit = Attack.doesHit(action, target, this.encounter.strategy.roll);
+      if (hit !== 'miss') {
+        const damages = Attack.rollAllDamage(
+          action, this.encounter.strategy.roll,
+          hit === 'crit' ? this.encounter.strategy.critical : null
+        );
         target.takeDamage(damages, false);
       }
     });
   }
 
-  private save(strategy: Models.EncounterStrategy, action: Models.Action, targets: Creature[]) {
+  private save(action: Models.Action, targets: Creature[]) {
     // TODO: This is flat out wrong!
-    const damages = Attack.rollAllDamage(action, strategy.roll);
+    const damages = Attack.rollAllDamage(action, this.encounter.strategy.roll);
     targets.forEach(target => {
-      let hit = Attack.doesHit(action, target, strategy.roll);
+      let hit = Attack.doesHit(action, target, this.encounter.strategy.roll);
       if (hit !== 'miss' && target.legendary && target.legendary.resistances > 0) {
         hit = 'miss';
         target.legendary.resistances--;

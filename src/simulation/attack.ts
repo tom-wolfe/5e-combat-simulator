@@ -6,7 +6,7 @@ export function doesHit(action: Models.Action, target: Creature, roll: RollDice)
   if (action.method === 'attack') {
     return toHit(action, target, roll);
   } else {
-    return savingThrow(action, target, roll);
+    return savingThrow(action, target);
   }
 }
 
@@ -16,8 +16,8 @@ export function toHit(action: Action, target: Creature, roll: RollDice): Models.
   return d20 + (action.mod || 0) >= target.ac ? 'hit' : 'miss';
 }
 
-export function savingThrow(action: Models.Action, target: Creature, roll: RollDice): Models.Hit {
-  return target.makeSave(action.save, action.mod, roll);
+export function savingThrow(action: Models.Action, target: Creature): Models.Hit {
+  return target.makeSave(action.save, action.mod);
 }
 
 export function rollAllDamage(action: Models.Action, roll: RollDice, modifier?: DiceStrategy): Damage[] {

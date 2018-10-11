@@ -3,6 +3,7 @@ import { SimulationResult } from '@sim/models/simulation';
 import * as _ from 'lodash';
 import { Creature } from './creature';
 import { DefaultEncounterStrategy } from './default-encounter-strategy.class';
+import { Encounter } from './encounter';
 
 export class Simulator {
   public strategy: EncounterStrategy
@@ -36,32 +37,24 @@ export class Simulator {
   }
 
   run(models: CreatureModel[]): EncounterResult {
-    const round = models.map(c => new Creature(c));
+    const creatures = models.map(c => new Creature(c));
+    const encounter = new Encounter(this.strategy, creatures);
 
-    this.begin(round);
+    encounter.rollInitiative();
+
     let winner: CreatureType;
     let rounds = 0;
-    while (!(winner = this.winner(round))) {
-      this.round(round);
+    while (!(winner = encounter.winner())) {
+      this.round(creatures);
       rounds++;
     }
-    return {
-      winner,
-      rounds,
-      survivors: round.filter(c => c.hp > 0).map(c => c.name)
-    };
-  }
-
-  begin(creatures: Creature[]) {
-    creatures.forEach(c => {
-      c.rollInitiative(this.strategy.roll);
-    });
+    return { winner, rounds, survivors: creatures.filter(c => c.hp > 0).map(c => c.name) };
   }
 
   round(creatures: Creature[]) {
     _.orderBy(creatures, c => c.initiative, 'desc').forEach(c => {
       if (c.hp > 0) {
-        c.turn(this.strategy, creatures, false);
+        c.turn(false);
         this.legendaryActions(c, creatures);
       }
     });
@@ -71,13 +64,8 @@ export class Simulator {
     const legendary = creatures.filter(c => c.legendary && c !== creature && c.legendary.actions > 0);
     if (legendary.length === 0) { return; }
     legendary.forEach(c => {
-      c.turn(this.strategy, creatures, true);
+      c.turn(true);
     });
   }
 
-  winner(creatures: Creature[]): CreatureType {
-    if (creatures.filter(c => c.type === 'player' && c.hp > 0).length === 0) { return 'monster'; }
-    if (creatures.filter(c => c.type === 'monster' && c.hp > 0).length === 0) { return 'player'; }
-    return undefined;
-  }
 }

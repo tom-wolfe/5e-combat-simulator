@@ -134,7 +134,7 @@ const creatures: CreatureModel[] = [dartagnan, sebastian, patricia, neferi, venn
 describe('ALL', () => {
   it('runs without error.', () => {
     const simulator = new Simulator();
-    const battles = 1000;
+    const battles = 1;
     const result = simulator.simulate(creatures, battles);
 
     const success = result.wins.player / battles * 100;
