@@ -48,7 +48,7 @@ export class Simulator {
       this.round(creatures);
       rounds++;
     }
-    return { winner, rounds, survivors: creatures.filter(c => c.hp > 0).map(c => c.name) };
+    return { winner, rounds, survivors: encounter.survivors.map(c => c.name) };
   }
 
   round(creatures: Creature[]) {

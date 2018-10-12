@@ -40,7 +40,6 @@ export class Creature {
     let damage = this.totalDamage(damages);
     if (half) { damage = Math.floor(damage / 2); }
     this.hp -= damage;
-    console.log(this.hp);
   }
 
   totalDamage(damages: Models.Damage[]): number {

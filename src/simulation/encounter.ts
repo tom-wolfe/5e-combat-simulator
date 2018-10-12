@@ -6,13 +6,17 @@ export class Encounter {
     creatures.forEach(c => c.setEncounter(this));
   }
 
+  get survivors(): Creature[] {
+    return this.creatures.filter(c => c.hp > 0);
+  }
+
   rollInitiative() {
     this.creatures.forEach(c => c.rollInitiative());
   }
 
   winner(): CreatureType {
-    if (this.creatures.every(c => c.type === 'player' && c.hp > 0)) { return 'player'; }
-    if (this.creatures.every(c => c.type === 'monster' && c.hp > 0)) { return 'monster'; }
+    if (this.survivors.every(c => c.type === 'player')) { return 'player'; }
+    if (this.survivors.every(c => c.type === 'monster')) { return 'monster'; }
     return undefined;
   }
 }
