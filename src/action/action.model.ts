@@ -7,7 +7,7 @@ export interface ActionModel {
   method: Method;
   legendary?: number;
   save?: Ability;
-  mod: number;
+  mod?: number;
   halfOnSave?: boolean;
   damages: DamageRoll[];
   uses?: number;

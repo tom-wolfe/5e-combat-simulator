@@ -41,9 +41,18 @@ const smartOffense: ActionStrategy = (creature, actions, targets, encounter) => 
   return { action, targets };
 }
 
+const smartDefense: ActionStrategy = (creature, actions, targets, encounter) => {
+  const allies = targets.filter(c => c.hp <= 0);
+  return {
+    action: Actions.highestAverage(actions).action,
+    targets: Targets.mostDangerous(allies)
+  };
+}
+
 export const Strategies = {
   first,
   random,
   mostDamageRandomTarget,
-  smartOffense
+  smartOffense,
+  smartDefense
 };

@@ -12,23 +12,23 @@ export const Actions = {
     return actions[random.numberBetween(0, actions.length - 1)]
   },
   highestAverage(actions: Action[]): { action: Action, damage: number } {
-    const result = max(actions, a => a.averageDamageTotal);
+    const result = max(actions, a => a.averageDiceTotal);
     return { action: result.object, damage: result.value };
   },
   leastForce(actions: Action[], targets: Creature[]): Action {
     const maxHp = _.max(targets.map(t => t.hp));
 
     // Try for the most powerful unlimited move.
-    let action = max(actions.filter(a => a.unlimited), a => a.averageDamageTotal);
+    let action = max(actions.filter(a => a.unlimited), a => a.averageDiceTotal);
 
     // If not, try for the least powerful limited move.
     if (action.value < maxHp) {
-      action = min(actions.filter(a => !a.unlimited && a.averageDamageTotal >= maxHp), a => a.averageDamageTotal);
+      action = min(actions.filter(a => !a.unlimited && a.averageDiceTotal >= maxHp), a => a.averageDiceTotal);
     }
 
     // Neither of those work, so just use the strongest action.
     if (!action.object) {
-      action = max(actions, a => a.averageDamageTotal);
+      action = max(actions, a => a.averageDiceTotal);
     }
 
     return action.object;

@@ -59,6 +59,11 @@ export class Creature {
     this.initiative = this.encounter.dice.roll('1d20') + this.model.initiativeMod;
   }
 
+  heal(amount: number) {
+    this.hp = Math.max(0, this.hp) + amount;
+    this.encounter.transcript.heal(this, amount);
+  }
+
   takeDamage(damages: Damage[]): number {
     const damage = this.totalDamage(damages)
     this.hp -= damage;
@@ -90,7 +95,7 @@ export class Creature {
       this.encounter.transcript.legendary(this);
     }
 
-    const approach = this.encounter.strategy.approach(this, this.encounter.strategy);
+    const approach = this.encounter.strategy.approach(this, this.encounter);
     const action = approach === 'offensive'
       ? this.offensive(legendary)
       : this.defensive(legendary);
@@ -100,14 +105,15 @@ export class Creature {
   }
 
   private offensive(legendary: boolean = false): TargetedAction {
-    const actions = this.actions.filter(a => a.available(legendary));
+    const actions = this.availableActions(legendary).filter(a => a.method !== 'heal');
     const targets = Targets.opposing(this, this.encounter.creatures).filter(c => c.hp > 0);
     return this.encounter.strategy.offensive(this, actions, targets, this.encounter);
   }
 
   private defensive(legendary: boolean = false): TargetedAction {
-    // TODO: Implement defensive action.
-    throw Error('Defensive action not implemented!');
+    const actions = this.availableActions(legendary).filter(a => a.method === 'heal');
+    const targets = Targets.allied(this, this.encounter.creatures);
+    return this.encounter.strategy.defensive(this, actions, targets, this.encounter);
   }
 
   private regenerate() {

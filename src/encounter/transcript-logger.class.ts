@@ -25,6 +25,10 @@ export class TranscriptLogger {
     }
   }
 
+  defend(creature: Creature, target: Creature, action: Action) {
+    this.log(`${creature.name} used ${action.name} on ${target.name}!`);
+  }
+
   save(creature: Creature, target: Creature, action: Action) {
     this.log(`${creature.name} used ${action.name} on ${target.name}.`);
   }
@@ -42,9 +46,16 @@ export class TranscriptLogger {
 
   }
 
-  takeDamage(creature: Creature, damage: number) {
-    if (damage > 0) {
-      this.log(`${creature.name} took ${damage} points of damage! ${creature.hp}hp remaining.`);
+  heal(creature: Creature, amount: number) {
+    if (amount > 0) {
+      this.log(`${creature.name} regained ${amount}hp! ${creature.hp}hp remaining.`);
+    }
+  }
+
+
+  takeDamage(creature: Creature, amount: number) {
+    if (amount > 0) {
+      this.log(`${creature.name} took ${amount} points of damage! ${creature.hp}hp remaining.`);
     }
   }
 

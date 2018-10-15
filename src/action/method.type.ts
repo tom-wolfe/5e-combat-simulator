@@ -1,1 +1,1 @@
-export type Method = 'attack' | 'save';
+export type Method = 'attack' | 'save' | 'heal';

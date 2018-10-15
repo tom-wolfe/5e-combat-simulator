@@ -1,5 +1,5 @@
 import { Creature } from '@sim/creature';
+import { Encounter } from '@sim/encounter';
 import { Approach } from './approach.type';
-import { EncounterStrategy } from '@sim/encounter';
 
-export type ApproachStrategy = (current: Creature, strategy: EncounterStrategy) => Approach;
+export type ApproachStrategy = (current: Creature, encounter: Encounter) => Approach;

@@ -1,16 +1,19 @@
 import { Creature } from '@sim/creature';
-import { EncounterStrategy } from '@sim/encounter';
-import { ApproachStrategy } from './approach-strategy.type';
+import { Encounter } from '@sim/encounter';
 import { Approach } from './approach.type';
-
-const offensive: ApproachStrategy = (current: Creature, strategy: EncounterStrategy): Approach => {
-  return 'offensive';
-}
-
-// TODO: Defensive if unconscious.
-// TODO: Smart - heal if close to unconscious.
+import { Targets } from './targets';
 
 export const Approaches = {
-  offensive
-
+  offensive(current: Creature, encounter: Encounter): Approach {
+    return 'offensive';
+  },
+  smart(current: Creature, encounter: Encounter): Approach {
+    if (Targets.allied(current, encounter.creatures).some(c => c.hp <= 0)) {
+      if (current.availableActions(false).some(a => a.method === 'heal')) {
+        return 'defensive';
+      }
+      return 'offensive';
+    };
+    return 'offensive';
+  }
 };

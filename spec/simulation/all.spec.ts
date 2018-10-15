@@ -11,33 +11,30 @@ const dartagnan: CreatureModel = {
   saves: { str: 6, dex: -1, con: 5, int: +2, wis: -2, cha: 1 },
   actions: [
     {
-      name: 'Lux Aeterna',
-      method: 'attack',
-      mod: 8,
+      name: 'Lux Aeterna', method: 'attack', mod: 8,
       damages: [
         { dice: '1d10', mod: 6, type: 'slashing', magical: true },
         { dice: '1d8', mod: 0, type: 'radiant', magical: true }
       ]
     },
     {
-      name: 'Fire Bolt',
-      method: 'attack',
-      mod: 4,
+      name: 'Fire Bolt', method: 'attack', mod: 4,
       damages: [
         { dice: '1d10', mod: 3, type: 'fire', magical: true },
       ]
     },
     {
-      name: 'Thunderwave',
-      method: 'save',
-      mod: 12,
-      save: 'con',
-      spellLevel: 1,
+      name: 'Thunderwave', method: 'save', mod: 12, save: 'con', spellLevel: 1,
       damages: [
         { dice: '3d8', mod: 0, type: 'thunder', magical: true },
       ]
     },
-    // TODO: 1 potion of healing.
+    {
+      name: 'Potion of Healing', method: 'heal', uses: 1,
+      damages: [
+        { dice: '2d4', mod: 2 },
+      ]
+    },
     // TODO: Action surge.
     // TODO: Second Wind
     // TODO: Shield.
@@ -77,12 +74,22 @@ const sebastian: CreatureModel = {
       name: 'Guiding Bolt', method: 'attack', mod: 5, spellLevel: 1,
       damages: [{ dice: '4d6', mod: 0, type: 'radiant', magical: true }]
     },
+    {
+      name: 'Potion of Healing', method: 'heal', uses: 1,
+      damages: [
+        { dice: '2d4', mod: 2 },
+      ]
+    },
+    {
+      name: 'Cure Wounds', method: 'heal', spellLevel: 1,
+      damages: [
+        { dice: '1d8', mod: 3 },
+      ]
+    },
     // TODO: Hellish rebuke.
     // TODO: Guiding Bolt advantage.
-    // TODO: Cure Wounds
     // TODO: Healing pool.
     // TODO: Fire flask. Silver bomb. Acid flask
-    // TODO: 1 potion of healing.
   ],
 };
 

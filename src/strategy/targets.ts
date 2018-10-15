@@ -28,7 +28,7 @@ export const Targets = {
     // Work out how much damage each action will do to each creature
     actions.forEach(action => {
       targets.forEach(target => {
-        const damage = target.totalDamage(action.averageDamage);
+        const damage = target.totalDamage(action.averageDice);
         data.push({ target, action, damage });
       });
     });

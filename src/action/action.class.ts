@@ -8,8 +8,9 @@ import { ActionModel } from './action.model';
 import { DamageRoll } from './damage-roll.interface';
 import { Damage } from './damage.interface';
 import { Hit } from './hit.type';
+import { Method } from './method.type';
 
-function normalDamageStrategy(damage: DamageRoll, roll: RollDice): number {
+function normalDiceStrategy(damage: DamageRoll, roll: RollDice): number {
   let amount = 0;
   if (damage.dice) { amount += (roll(damage.dice) || 0); }
   if (damage.mod) { amount += (damage.mod || 0); }
@@ -18,24 +19,23 @@ function normalDamageStrategy(damage: DamageRoll, roll: RollDice): number {
 
 export class Action {
   private _average: Damage[];
-  private _averageDamageTotal: number;
+  private _averageDiceTotal: number;
   private _uses: number;
 
-  public name: string;
-
   constructor(private encounter: Encounter, private creature: Creature, private model: ActionModel) {
-    this.name = model.name;
     this._uses = model.uses;
     const dice = new Dice(null, new AverageProvider());
-    this._average = this.rollCustomDamage(normalDamageStrategy, i => dice.roll(i).total);
-    this._averageDamageTotal = _.sum(this._average.map(a => a.amount));
+    this._average = this.rollCustomDice(normalDiceStrategy, i => dice.roll(i).total);
+    this._averageDiceTotal = _.sum(this._average.map(a => a.amount));
   }
 
+  get name(): string { return this.model.name; }
+  get method(): Method { return this.model.method; }
   get unlimited(): boolean {
     return this._uses === undefined && this.model.spellLevel === undefined;
   }
-  get averageDamage(): Damage[] { return this._average; }
-  get averageDamageTotal(): number { return this._averageDamageTotal; }
+  get averageDice(): Damage[] { return this._average; }
+  get averageDiceTotal(): number { return this._averageDiceTotal; }
 
   available(legendary: boolean): boolean {
     if (!!this.model.legendary !== legendary) { return false; }
@@ -45,16 +45,28 @@ export class Action {
   }
 
   take(targets: Creature[], legendary: boolean) {
-    this.model.method === 'attack' ? this.attack(targets) : this.save(targets);
+    switch (this.model.method) {
+      case 'attack': this.attack(targets); break;
+      case 'save': this.save(targets); break;
+      case 'heal': this.heal(targets);  break;
+    }
     this.expend(legendary);
   }
 
   private attack(targets: Creature[]) {
     targets.forEach(target => {
       const hit = this.toHit(target);
-      const damage = this.rollDamage(hit);
+      const damage = this.rollDice(hit);
       this.encounter.transcript.attack(this.creature, hit, target, this);
       target.takeDamage(damage);
+    });
+  }
+
+  private heal(targets: Creature[]) {
+    const amount = _.sum(this.rollDice().map(d => d.amount));
+    targets.forEach(target => {
+      this.encounter.transcript.defend(this.creature, target, this);
+      target.heal(amount);
     });
   }
 
@@ -64,13 +76,13 @@ export class Action {
     if (this.model.spellLevel) { this.creature.spellSlots[this.model.spellLevel]--; }
   }
 
-  private rollDamage(hit: Hit): Damage[] {
+  private rollDice(hit: Hit = 'hit'): Damage[] {
     if (hit === 'miss') { return []; }
-    const roller = (hit === 'crit') ? this.encounter.strategy.critical : normalDamageStrategy;
-    return this.rollCustomDamage(roller, this.encounter.dice.roll)
+    const roller = (hit === 'crit') ? this.encounter.strategy.critical : normalDiceStrategy;
+    return this.rollCustomDice(roller, this.encounter.dice.roll)
   }
 
-  private rollCustomDamage(strategy: DiceStrategy, roll: RollDice): Damage[] {
+  private rollCustomDice(strategy: DiceStrategy, roll: RollDice): Damage[] {
     return this.model.damages.map(damage => ({
       amount: strategy(damage, roll),
       type: damage.type,
@@ -79,7 +91,7 @@ export class Action {
   }
 
   private save(targets: Creature[]) {
-    const damage = this.rollDamage('hit');
+    const damage = this.rollDice('hit');
     targets.forEach(target => {
       this.encounter.transcript.save(this.creature, target, this);
       const targetDamage = _.cloneDeep(damage);
