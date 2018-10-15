@@ -21,7 +21,10 @@ export class Action {
   private _averageDamageTotal: number;
   private _uses: number;
 
+  public name: string;
+
   constructor(private encounter: Encounter, private creature: Creature, private model: ActionModel) {
+    this.name = model.name;
     this._uses = model.uses;
     const dice = new Dice(null, new AverageProvider());
     this._average = this.rollCustomDamage(normalDamageStrategy, i => dice.roll(i).total);
@@ -50,6 +53,7 @@ export class Action {
     targets.forEach(target => {
       const hit = this.toHit(target);
       const damage = this.rollDamage(hit);
+      this.encounter.transcript.attack(this.creature, hit, target, this);
       target.takeDamage(damage);
     });
   }
@@ -77,6 +81,7 @@ export class Action {
   private save(targets: Creature[]) {
     const damage = this.rollDamage('hit');
     targets.forEach(target => {
+      this.encounter.transcript.save(this.creature, target, this);
       const targetDamage = _.cloneDeep(damage);
       const hit = target.makeSave(this.model.mod, this.model.save);
       if (hit === 'miss') {

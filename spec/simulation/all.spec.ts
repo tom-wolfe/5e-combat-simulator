@@ -202,6 +202,7 @@ describe('ALL', () => {
       message += `\n${s} has a ${n.toFixed(2)}% chance of surviving.`;
     });
     message += `\nBattle lasted an average of ${result.averageRounds} rounds.`;
+
     console.log(message);
   });
 });

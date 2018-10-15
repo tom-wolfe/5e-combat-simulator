@@ -44,10 +44,14 @@ export class Creature {
     if (d20 === 20) { return 'miss'; };
 
     let result: Hit = d20 + this.model.saves[save] >= dc ? 'miss' : 'hit';
+    let legendary = false;
     if (result === 'hit' && this.legendary.resistances > 0) {
       this.legendary.resistances--;
       result = 'miss';
+      legendary = true;
     }
+
+    this.encounter.transcript.makeSave(this, result, legendary);
     return result;
   }
 
@@ -55,8 +59,11 @@ export class Creature {
     this.initiative = this.encounter.dice.roll('1d20') + this.model.initiativeMod;
   }
 
-  takeDamage(damages: Damage[]) {
-    this.hp -= this.totalDamage(damages);
+  takeDamage(damages: Damage[]): number {
+    const damage = this.totalDamage(damages)
+    this.hp -= damage;
+    this.encounter.transcript.takeDamage(this, damage);
+    return damage;
   }
 
   totalDamage(damages: Damage[]): number {
@@ -76,14 +83,19 @@ export class Creature {
   }
 
   turn(legendary: boolean = false) {
-    this.regenerate();
-    this.resetLegendaryActions();
+    if (!legendary) {
+      this.regenerate();
+      this.resetLegendaryActions();
+    } else {
+      this.encounter.transcript.legendary(this);
+    }
 
     const approach = this.encounter.strategy.approach(this, this.encounter.strategy);
     const action = approach === 'offensive'
       ? this.offensive(legendary)
       : this.defensive(legendary);
     if (!action.action || action.targets.length === 0) { return; }
+
     action.action.take(action.targets, legendary);
   }
 
@@ -101,6 +113,7 @@ export class Creature {
   private regenerate() {
     if (!this.model.regeneration) { return; }
     this.hp = Math.min(this.hp + this.model.regeneration, this.model.maxHp);
+    this.encounter.transcript.regenerate(this, this.model.regeneration);
   }
 
   private resetLegendaryActions() {

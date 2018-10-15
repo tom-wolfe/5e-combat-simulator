@@ -3,13 +3,17 @@ import * as _ from 'lodash';
 import { DiceRoller } from './dice-roller.interface';
 import { EncounterResult } from './encounter-result.interface';
 import { EncounterStrategy } from './encounter-strategy.model';
+import { EncounterTranscript } from './encounter-transcript.interface';
+import { TranscriptLogger } from './transcript-logger.class';
 
 export class Encounter {
   public creatures: Creature[];
   public rounds = 0;
+  public transcript: TranscriptLogger;
 
   constructor(public strategy: EncounterStrategy, public dice: DiceRoller, models: CreatureModel[]) {
     this.creatures = models.map(m => new Creature(this, m));
+    this.transcript = new TranscriptLogger();
   }
 
   get survivors(): Creature[] {
@@ -23,10 +27,12 @@ export class Encounter {
   run(): EncounterResult {
     this.rollInitiative();
     while (!this.winner()) { this.round(); }
+    this.transcript.winner(this.winner());
     return {
       winner: this.winner(),
       rounds: this.rounds,
-      survivors: this.survivors
+      survivors: this.survivors,
+      transcript: this.transcript.getTranscript()
     };
   }
 
@@ -35,6 +41,7 @@ export class Encounter {
   }
 
   private round() {
+    this.transcript.nextRound();
     this.initiativeOrder.forEach(c => {
       if (c.hp > 0) {
         c.turn(false);
