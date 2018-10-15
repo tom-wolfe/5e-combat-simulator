@@ -1,8 +1,7 @@
-import { ActionStrategy, ApproachStrategy, DiceStrategy, EncounterStrategy, RollDice } from '@sim/models';
+import { EncounterStrategy } from '@sim/encounter';
+import { RollDice } from '@sim/random';
+import { ActionStrategy, Approaches, ApproachStrategy, Criticals, DiceStrategy, Strategies } from '@sim/strategy';
 import { DefaultRandomProvider, Dice, RandomProvider } from 'dice-typescript';
-import { offensive } from './approach';
-import { rollTwice } from './critical';
-import { random, smartOffense } from './strategy';
 
 export class DefaultEncounterStrategy implements EncounterStrategy {
   constructor() {
@@ -11,8 +10,8 @@ export class DefaultEncounterStrategy implements EncounterStrategy {
   }
   random: RandomProvider = new DefaultRandomProvider();
   roll: RollDice;
-  approach: ApproachStrategy = offensive;
-  offensive: ActionStrategy = smartOffense;
-  defensive: ActionStrategy = random;
-  critical: DiceStrategy = rollTwice;
+  approach: ApproachStrategy = Approaches.offensive;
+  offensive: ActionStrategy = Strategies.smartOffense;
+  defensive: ActionStrategy = Strategies.random;
+  critical: DiceStrategy = Criticals.rollTwice;
 }

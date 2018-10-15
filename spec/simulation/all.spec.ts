@@ -1,5 +1,5 @@
-import { CreatureModel } from '@sim/models';
-import { Simulator } from '@sim/simulation/simulator';
+import { CreatureModel } from '@sim/creature';
+import { Simulator } from '@sim/simulation';
 
 const dartagnan: CreatureModel = {
   name: 'D\'artagnan',
