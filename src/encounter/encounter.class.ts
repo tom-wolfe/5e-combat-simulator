@@ -1,5 +1,6 @@
 import { Creature, CreatureModel, CreatureType } from '@sim/creature';
 import * as _ from 'lodash';
+import { DiceRoller } from './dice-roller.interface';
 import { EncounterResult } from './encounter-result.interface';
 import { EncounterStrategy } from './encounter-strategy.model';
 
@@ -7,7 +8,7 @@ export class Encounter {
   public creatures: Creature[];
   public rounds = 0;
 
-  constructor(public strategy: EncounterStrategy, models: CreatureModel[]) {
+  constructor(public strategy: EncounterStrategy, public dice: DiceRoller, models: CreatureModel[]) {
     this.creatures = models.map(m => new Creature(this, m));
   }
 

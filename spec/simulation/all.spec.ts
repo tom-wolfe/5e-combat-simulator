@@ -4,35 +4,85 @@ import { Simulator } from '@sim/simulation';
 const dartagnan: CreatureModel = {
   name: 'D\'artagnan',
   type: 'player',
-  ac: 16,
-  maxHp: 27,
+  ac: 19,
+  maxHp: 36,
   initiativeMod: -1,
-  saves: { str: 6, dex: 0, con: 4, int: 0, wis: -1, cha: 0 },
+  spellSlots: { 1: 3 },
+  saves: { str: 6, dex: -1, con: 5, int: +2, wis: -2, cha: 1 },
   actions: [
     {
       name: 'Lux Aeterna',
       method: 'attack',
       mod: 8,
       damages: [
-        { dice: '1d8', mod: 6, type: 'slashing', magical: true },
+        { dice: '1d10', mod: 6, type: 'slashing', magical: true },
         { dice: '1d8', mod: 0, type: 'radiant', magical: true }
       ]
-    }
+    },
+    {
+      name: 'Fire Bolt',
+      method: 'attack',
+      mod: 4,
+      damages: [
+        { dice: '1d10', mod: 3, type: 'fire', magical: true },
+      ]
+    },
+    {
+      name: 'Thunderwave',
+      method: 'save',
+      mod: 12,
+      save: 'con',
+      spellLevel: 1,
+      damages: [
+        { dice: '3d8', mod: 0, type: 'thunder', magical: true },
+      ]
+    },
+    // TODO: 1 potion of healing.
+    // TODO: Action surge.
+    // TODO: Second Wind
+    // TODO: Shield.
   ],
 };
 
 const sebastian: CreatureModel = {
   name: 'Sebastian',
   type: 'player',
-  ac: 15,
+  ac: 18,
   maxHp: 27,
-  initiativeMod: 2,
-  saves: { str: 0, dex: 0, con: 4, int: 6, wis: 0, cha: 0 },
+  initiativeMod: 3,
+  spellSlots: { 1: 4, },
+  saves: { str: -1, dex: +3, con: +3, int: +5, wis: +2, cha: +0 },
   actions: [
     {
-      name: 'Fire Bolt', method: 'attack', mod: 6,
-      damages: [{ dice: '1d8', type: 'fire', magical: true }]
-    }
+      name: 'Sacred Flame', method: 'save', mod: 13, save: 'dex',
+      damages: [{ dice: '1d8', type: 'radiant', magical: true }]
+    },
+    {
+      name: 'Crossbow', method: 'attack', mod: 5,
+      damages: [{ dice: '1d8', mod: 3, type: 'piercing', magical: false }]
+    },
+    {
+      name: 'Catapult', method: 'save', mod: 13, save: 'dex', spellLevel: 1,
+      damages: [{ dice: '3d8', mod: 0, type: 'bludgeoning', magical: true }]
+    },
+    {
+      name: 'Eldritch Blast', method: 'attack', mod: 5,
+      damages: [{ dice: '1d10', mod: 0, type: 'force', magical: true }]
+    },
+    {
+      name: 'Arms of Hadar', method: 'save', mod: 13, save: 'str', spellLevel: 1, halfOnSave: true,
+      damages: [{ dice: '2d6', mod: 0, type: 'necrotic', magical: true }]
+    },
+    {
+      name: 'Guiding Bolt', method: 'attack', mod: 5, spellLevel: 1,
+      damages: [{ dice: '4d6', mod: 0, type: 'radiant', magical: true }]
+    },
+    // TODO: Hellish rebuke.
+    // TODO: Guiding Bolt advantage.
+    // TODO: Cure Wounds
+    // TODO: Healing pool.
+    // TODO: Fire flask. Silver bomb. Acid flask
+    // TODO: 1 potion of healing.
   ],
 };
 
@@ -55,15 +105,22 @@ const neferi: CreatureModel = {
   name: 'Neferi',
   type: 'player',
   ac: 15,
-  maxHp: 27,
-  initiativeMod: 4,
-  saves: { str: 6, dex: 0, con: 0, int: 0, wis: 0, cha: 0 },
+  maxHp: 25,
+  initiativeMod: 11,
+  saves: { str: 0, dex: 5, con: 1, int: 2, wis: 1, cha: 2 },
   actions: [
     {
-      name: 'Sneak Attack', method: 'attack', mod: 6,
+      name: 'Staff + Sneak Attack', method: 'attack', mod: 6,
       damages: [
-        { dice: '1d8', type: 'bludgeoning' },
+        { dice: '1d8', mod: 4, type: 'bludgeoning' },
         { dice: '2d6', type: 'bludgeoning' }
+      ]
+    },
+    {
+      name: 'Scimitar of Warning', method: 'attack', mod: 7,
+      damages: [
+        { dice: '1d8', mod: 5, type: 'slashing', magical: true },
+        { dice: '2d6', type: 'bludgeoning', magical: true }
       ]
     }
   ],

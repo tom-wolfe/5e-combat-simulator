@@ -13,7 +13,7 @@ const creature = new Creature(null, {
 describe('action', () => {
   describe('first', () => {
     it('returns first action with uses remaining.', () => {
-      const result = Actions.first(creature.actions, null);
+      const result = Actions.first(creature.actions);
       expect(result).toEqual(creature.actions[0]);
     });
   });

@@ -57,14 +57,13 @@ export class Action {
   private expend(legendary: boolean) {
     if (this._uses !== undefined) { this._uses--; }
     if (legendary && this.model.legendary) { this.creature.legendary.actions -= this.model.legendary; }
-    // TODO: Upcast.
     if (this.model.spellLevel) { this.creature.spellSlots[this.model.spellLevel]--; }
   }
 
   private rollDamage(hit: Hit): Damage[] {
     if (hit === 'miss') { return []; }
     const roller = (hit === 'crit') ? this.encounter.strategy.critical : normalDamageStrategy;
-    return this.rollCustomDamage(roller, this.encounter.strategy.roll)
+    return this.rollCustomDamage(roller, this.encounter.dice.roll)
   }
 
   private rollCustomDamage(strategy: DiceStrategy, roll: RollDice): Damage[] {
@@ -92,7 +91,7 @@ export class Action {
   }
 
   private toHit(target: Creature): Hit {
-    const d20 = this.encounter.strategy.roll('1d20');
+    const d20 = this.encounter.dice.roll('1d20');
     if (d20 === 20) { return 'crit'; };
     return target.doesHit(d20 + (this.model.mod || 0));
   }

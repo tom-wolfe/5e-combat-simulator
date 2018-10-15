@@ -26,21 +26,21 @@ export class Creature {
     this.actions = model.actions.map(a => new Action(encounter, this, a));
   }
 
+  availableActions(legendary: boolean): Action[] {
+    return this.actions.filter(a => a.available(legendary));
+  }
+
+  doesHit(roll: number): Hit {
+    return roll >= this.model.ac ? 'hit' : 'miss';
+  }
+
   highestSpellSlot(): number {
     if (!this.model.spellSlots) { return undefined; }
     return _.max(Object.keys(this.spellSlots).filter(level => this.spellSlots[level] > 0).map(Number));
   }
 
-  availableActions(legendary: boolean): Action[] {
-    return this.actions.filter(a => a.available(legendary));
-  }
-
-  rollInitiative() {
-    this.initiative = this.encounter.strategy.roll('1d20') + this.model.initiativeMod;
-  }
-
   makeSave(dc: number, save: Ability): Hit {
-    const d20 = this.encounter.strategy.roll('1d20');
+    const d20 = this.encounter.dice.roll('1d20');
     if (d20 === 20) { return 'miss'; };
 
     let result: Hit = d20 + this.model.saves[save] >= dc ? 'miss' : 'hit';
@@ -51,8 +51,8 @@ export class Creature {
     return result;
   }
 
-  doesHit(roll: number): Hit {
-    return roll >= this.model.ac ? 'hit' : 'miss';
+  rollInitiative() {
+    this.initiative = this.encounter.dice.roll('1d20') + this.model.initiativeMod;
   }
 
   takeDamage(damages: Damage[]) {
@@ -90,7 +90,7 @@ export class Creature {
   private offensive(legendary: boolean = false): TargetedAction {
     const actions = this.actions.filter(a => a.available(legendary));
     const targets = Targets.opposing(this, this.encounter.creatures).filter(c => c.hp > 0);
-    return this.encounter.strategy.offensive(this, actions, targets, this.encounter.strategy);
+    return this.encounter.strategy.offensive(this, actions, targets, this.encounter);
   }
 
   private defensive(legendary: boolean = false): TargetedAction {

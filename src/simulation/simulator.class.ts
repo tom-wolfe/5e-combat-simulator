@@ -1,5 +1,6 @@
 import { CreatureModel } from '@sim/creature';
-import { Encounter, EncounterStrategy } from '@sim/encounter';
+import { DiceRoller, Encounter, EncounterStrategy } from '@sim/encounter';
+import { DefaultDiceRoller } from './default-dice-roller.class';
 import { DefaultEncounterStrategy } from './default-encounter-strategy.class';
 
 export interface SimulationResult {
@@ -16,8 +17,10 @@ export interface SimulationResult {
 
 export class Simulator {
   public strategy: EncounterStrategy;
-  constructor(strategy?: EncounterStrategy) {
+  public dice: DiceRoller;
+  constructor(strategy?: EncounterStrategy, dice?: DiceRoller) {
     this.strategy = strategy || new DefaultEncounterStrategy();
+    this.dice = dice || new DefaultDiceRoller();
   }
 
   simulate(models: CreatureModel[], battles: number): SimulationResult {
@@ -29,7 +32,7 @@ export class Simulator {
     };
 
     for (let x = 0; x < battles; x++) {
-      const encounter = new Encounter(this.strategy, models);
+      const encounter = new Encounter(this.strategy, this.dice, models);
       const encounterResult = encounter.run();
 
       result.averageRounds += encounterResult.rounds;
