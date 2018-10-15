@@ -1,11 +1,10 @@
-import { ActionForecast, ActionModel } from '@sim/action';
+import { Action, ActionForecast } from '@sim/action';
 import { Creature } from '@sim/creature';
 import { EncounterStrategy } from '@sim/encounter';
 import { AverageProvider } from '@sim/random';
 import { max } from '@sim/util';
 import { Dice } from 'dice-typescript';
 import { Actions } from './actions';
-import { Attack } from './attack';
 
 function allied(current: Creature, creatures: Creature[]): Creature[] {
   return creatures.filter(c => c.type === current.type);
@@ -29,7 +28,7 @@ function random(targets: Creature[], strategy: EncounterStrategy, count: number)
   return ret;
 }
 
-function canKill(actions: ActionModel[], targets: Creature[]): ActionForecast[] {
+function canKill(actions: Action[], targets: Creature[]): ActionForecast[] {
   const data: ActionForecast[] = [];
   const avgProvider = new AverageProvider();
   const dice = new Dice(null, avgProvider);
@@ -38,8 +37,7 @@ function canKill(actions: ActionModel[], targets: Creature[]): ActionForecast[] 
   // Work out how much damage each action will do to each creature
   actions.forEach(action => {
     targets.forEach(target => {
-      const avgDamage = Attack.rollAllDamage(action, avgRoll, null);
-      const damage = target.totalDamage(avgDamage);
+      const damage = target.totalDamage(action.averageDamage);
       data.push({ target, action, damage });
     });
   });

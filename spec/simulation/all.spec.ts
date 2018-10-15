@@ -113,12 +113,12 @@ const monster: CreatureModel = {
     },
     {
       name: 'Arms of Hadar',
-      method: 'save', save: 'str', mod: 15, halfOnSuccess: true, uses: 1,
+      method: 'save', save: 'str', mod: 15, halfOnSave: true, uses: 1,
       damages: [{ dice: '4d6', mod: 0, type: 'cold' }]
     },
     {
       name: 'Blight',
-      method: 'save', save: 'con', mod: 15, halfOnSuccess: true, uses: 1,
+      method: 'save', save: 'con', mod: 15, halfOnSave: true, uses: 1,
       damages: [{ dice: '6d8', mod: 0, type: 'cold' }]
     },
     {

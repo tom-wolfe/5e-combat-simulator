@@ -1,8 +1,8 @@
 import { Creature } from '@sim/creature';
-import { ActionModel } from './action.model';
+import { Action } from './action.class';
 
 export interface ActionForecast {
-  action: ActionModel;
+  action: Action;
   target: Creature;
   damage: number;
 }

@@ -8,7 +8,7 @@ export interface ActionModel {
   legendary?: number;
   save?: Ability;
   mod: number;
-  halfOnSuccess?: boolean;
+  halfOnSave?: boolean;
   damages: DamageRoll[];
   uses?: number;
   spellLevel?: number;

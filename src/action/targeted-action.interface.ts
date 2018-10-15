@@ -1,8 +1,7 @@
 import { Creature } from '@sim/creature';
-import { ActionModel } from './action.model';
+import { Action } from './action.class';
 
 export interface TargetedAction {
-  action: ActionModel;
+  action: Action;
   targets: Creature[];
-  castLevel: number;
 }

@@ -3,7 +3,6 @@ export * from './actions';
 export * from './approach-strategy.type';
 export * from './approach.type';
 export * from './approaches';
-export * from './attack';
 export * from './criticals';
 export * from './dice-strategy.type';
 export * from './strategies';

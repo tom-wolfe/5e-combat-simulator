@@ -11,12 +11,6 @@ const creature = new Creature(null, {
 });
 
 describe('action', () => {
-  describe('possibleActions', () => {
-    it('returns actions with uses remaining.', () => {
-      const result = Actions.possibleActions(creature, false);
-      expect(result).toEqual([creature.actions[1], creature.actions[2]]);
-    });
-  });
   describe('first', () => {
     it('returns first action with uses remaining.', () => {
       const result = Actions.first(creature.actions, null);
