@@ -10,13 +10,11 @@ export interface CreatureModel {
   type: CreatureType,
   ac: number,
   actions: ActionModel[];
-  hp?: number;
   maxHp: number,
   legendary?: Legendary;
   regeneration?: number;
   alterations?: DamageTypeAlteration[];
   spellSlots?: SpellSlots;
   initiativeMod: number;
-  initiative?: number;
   saves: AbilityScores;
 }

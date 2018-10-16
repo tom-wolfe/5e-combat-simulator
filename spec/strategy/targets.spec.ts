@@ -2,11 +2,11 @@ import { Creature } from '@sim/creature';
 import { Targets } from '@sim/strategy';
 
 const creatures = [
-  new Creature(null, { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'monster', saves: null }),
-  new Creature(null, { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'player', saves: null }),
-  new Creature(null, { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'monster', saves: null }),
-  new Creature(null, { name: '', ac: 10, hp: 8, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'player', saves: null }),
-  new Creature(null, { name: '', ac: 10, hp: 10, maxHp: 20, actions: [], initiative: 10, initiativeMod: 0, type: 'monster', saves: null }),
+  new Creature(null, { name: '', ac: 10, maxHp: 20, actions: [], initiativeMod: 0, type: 'monster', saves: null }),
+  new Creature(null, { name: '', ac: 10, maxHp: 20, actions: [], initiativeMod: 0, type: 'player', saves: null }),
+  new Creature(null, { name: '', ac: 10, maxHp: 20, actions: [], initiativeMod: 0, type: 'monster', saves: null }),
+  new Creature(null, { name: '', ac: 10, maxHp: 20, actions: [], initiativeMod: 0, type: 'player', saves: null }),
+  new Creature(null, { name: '', ac: 10, maxHp: 20, actions: [], initiativeMod: 0, type: 'monster', saves: null }),
 ];
 
 describe('offensive', () => {

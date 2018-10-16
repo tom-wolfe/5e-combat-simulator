@@ -1,4 +1,4 @@
-import { CreatureModel } from '@sim/creature';
+import { CreatureModel, Creature } from '@sim/creature';
 import { DiceRoller, Encounter, EncounterStrategy } from '@sim/encounter';
 import { DefaultDiceRoller } from './default-dice-roller.class';
 import { DefaultEncounterStrategy } from './default-encounter-strategy.class';
@@ -32,9 +32,9 @@ export class Simulator {
     };
 
     for (let x = 0; x < battles; x++) {
-      const encounter = new Encounter(this.strategy, this.dice, models);
+      const encounter = new Encounter(this.strategy, this.dice);
+      encounter.creatures.push(...models.map(m => new Creature(encounter, m)));
       const encounterResult = encounter.run();
-      console.log(JSON.stringify(encounterResult.transcript, null, 2));
 
       result.averageRounds += encounterResult.rounds;
       result.wins[encounterResult.winner]++;

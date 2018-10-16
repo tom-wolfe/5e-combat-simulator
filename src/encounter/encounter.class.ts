@@ -7,12 +7,11 @@ import { EncounterTranscript } from './encounter-transcript.interface';
 import { TranscriptLogger } from './transcript-logger.class';
 
 export class Encounter {
-  public creatures: Creature[];
+  public creatures: Creature[] = [];
   public rounds = 0;
   public transcript: TranscriptLogger;
 
-  constructor(public strategy: EncounterStrategy, public dice: DiceRoller, models: CreatureModel[]) {
-    this.creatures = models.map(m => new Creature(this, m));
+  constructor(public strategy: EncounterStrategy, public dice: DiceRoller) {
     this.transcript = new TranscriptLogger();
   }
 
@@ -21,7 +20,7 @@ export class Encounter {
   }
 
   get initiativeOrder(): Creature[] {
-    return _.orderBy(this.creatures, c => c.initiative, 'desc')
+    return _.orderBy(this.creatures, c => c.initiative, 'desc');
   }
 
   run(): EncounterResult {
@@ -58,7 +57,8 @@ export class Encounter {
   }
 
   private legendaryTurns(creature: Creature) {
-    const legendary = this.creatures.filter(c => c.legendary && c !== creature && c.legendary.actions > 0);
-    legendary.forEach(c => c.turn(true));
+    this.creatures
+      .filter(c => c !== creature && c.hasLegendaryActions())
+      .forEach(c => c.turn(true));
   }
 }

@@ -6,7 +6,7 @@ const creature = new Creature(null, {
     { name: '', method: 'attack', mod: 10, damages: [], uses: 0 },
     { name: '', method: 'attack', mod: 10, damages: [] },
     { name: '', method: 'attack', mod: 10, damages: [], uses: 2 }
-  ], hp: 10, maxHp: 10, initiative: 20, initiativeMod: 2,
+  ], maxHp: 10, initiativeMod: 2,
   saves: null
 });
 

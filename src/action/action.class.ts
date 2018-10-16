@@ -39,6 +39,7 @@ export class Action {
 
   available(legendary: boolean): boolean {
     if (!!this.model.legendary !== legendary) { return false; }
+    if (legendary && this.creature.legendary.actions < this.model.legendary) { return false; }
     if (this.unlimited) { return true; }
     if (this._uses > 0) { return true; }
     return this.model.spellLevel <= this.creature.highestSpellSlot();
@@ -48,7 +49,7 @@ export class Action {
     switch (this.model.method) {
       case 'attack': this.attack(targets); break;
       case 'save': this.save(targets); break;
-      case 'heal': this.heal(targets);  break;
+      case 'heal': this.heal(targets); break;
     }
     this.expend(legendary);
   }

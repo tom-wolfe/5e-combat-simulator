@@ -9,22 +9,21 @@ import { Legendary } from './legendary.interface';
 import { SpellSlots } from './spell-slots.interface';
 
 export class Creature {
-  name: string;
   hp: number;
   initiative: number;
-  type: CreatureType;
-  legendary: Legendary;
   spellSlots: SpellSlots;
   actions: Action[];
+  legendary: Legendary;
 
   constructor(private encounter: Encounter, private model: CreatureModel) {
-    this.name = model.name;
     this.hp = model.maxHp;
-    this.type = model.type;
     this.legendary = { ...model.legendary };
     this.spellSlots = { ...model.spellSlots };
     this.actions = model.actions.map(a => new Action(encounter, this, a));
   }
+
+  get name(): string { return this.model.name; }
+  get type(): string { return this.model.type; }
 
   availableActions(legendary: boolean): Action[] {
     return this.actions.filter(a => a.available(legendary));
@@ -32,6 +31,16 @@ export class Creature {
 
   doesHit(roll: number): Hit {
     return roll >= this.model.ac ? 'hit' : 'miss';
+  }
+
+  hasLegendaryActions(): boolean {
+    return this.legendary && this.legendary.actions > 0;
+  }
+
+  heal(amount: number): number {
+    this.hp = Math.min(Math.max(0, this.hp) + amount, this.model.maxHp);
+    this.encounter.transcript.heal(this, amount);
+    return this.hp;
   }
 
   highestSpellSlot(): number {
@@ -55,20 +64,16 @@ export class Creature {
     return result;
   }
 
-  rollInitiative() {
-    this.initiative = this.encounter.dice.roll('1d20') + this.model.initiativeMod;
-  }
 
-  heal(amount: number) {
-    this.hp = Math.max(0, this.hp) + amount;
-    this.encounter.transcript.heal(this, amount);
+  rollInitiative(): number {
+    return this.initiative = this.encounter.dice.roll('1d20') + this.model.initiativeMod;
   }
 
   takeDamage(damages: Damage[]): number {
     const damage = this.totalDamage(damages)
     this.hp -= damage;
     this.encounter.transcript.takeDamage(this, damage);
-    return damage;
+    return this.hp;
   }
 
   totalDamage(damages: Damage[]): number {
@@ -126,5 +131,4 @@ export class Creature {
     if (!this.model.legendary) { return; }
     this.legendary.actions = this.model.legendary.actions;
   }
-
 }
