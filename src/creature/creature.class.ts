@@ -64,14 +64,14 @@ export class Creature {
     return result;
   }
 
-
   rollInitiative(): number {
     return this.initiative = this.encounter.dice.roll('1d20') + this.model.initiativeMod;
   }
 
   takeDamage(damages: Damage[]): number {
     const damage = this.totalDamage(damages)
-    this.hp -= damage;
+    this.hp = Math.max(this.hp - damage, 0);
+
     this.encounter.transcript.takeDamage(this, damage);
     return this.hp;
   }

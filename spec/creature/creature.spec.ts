@@ -10,6 +10,7 @@ const model: CreatureModel = {
   actions: [],
   initiativeMod: 1,
   maxHp: 20,
+  regeneration: 10,
   saves: { str: 0, dex: 0, con: 0, int: 0, wis: 3, cha: 0 },
   legendary: { actions: 3, resistances: 0 },
   alterations: [
@@ -97,6 +98,25 @@ describe('creature', () => {
       expect(creature.rollInitiative()).toEqual(11);
     });
   });
+  describe('takeDamage', () => {
+    it('should subtract damage from HP.', () => {
+      const encounter = new Encounter(null, null);
+      const creature = new Creature(encounter, model);
+      const damage: Damage[] = [
+        { amount: 6 },
+        { amount: 4 }
+      ];
+      expect(creature.takeDamage(damage)).toEqual(10);
+    });
+    it('should not drop hp below zero.', () => {
+      const encounter = new Encounter(null, null);
+      const creature = new Creature(encounter, model);
+      const damage: Damage[] = [
+        { amount: 9999, type: 'fire' },
+      ];
+      expect(creature.takeDamage(damage)).toEqual(0);
+    });
+  });
   describe('totalDamage', () => {
     it('should add all damage together.', () => {
       const encounter = new Encounter(null, null);
@@ -140,6 +160,45 @@ describe('creature', () => {
         { amount: 7, type: 'thunder' },
       ];
       expect(creature.totalDamage(damage)).toEqual(14);
+    });
+  });
+  describe('turn', () => {
+    describe('turn', () => {
+      it('should reset legendary actions on a regular turn.', () => {
+        const encounter = new Encounter();
+        const creature = new Creature(encounter, model);
+        creature.legendary.actions = 0;
+        creature.turn(false);
+        expect(creature.legendary.actions).toEqual(3);
+      });
+      it('should not reset legendary actions on a legendary turn.', () => {
+        const encounter = new Encounter();
+        const creature = new Creature(encounter, model);
+        creature.legendary.actions = 1;
+        creature.turn(true);
+        expect(creature.legendary.actions).toEqual(1);
+      });
+      it('should regenerate health on a regular turn.', () => {
+        const encounter = new Encounter();
+        const creature = new Creature(encounter, model);
+        creature.hp = 10;
+        creature.turn(false);
+        expect(creature.hp).toEqual(20);
+      });
+      it('should not regenerate health over max.', () => {
+        const encounter = new Encounter();
+        const creature = new Creature(encounter, model);
+        creature.hp = 15;
+        creature.turn(false);
+        expect(creature.hp).toEqual(20);
+      });
+      it('should not regenerate health on a legendary turn.', () => {
+        const encounter = new Encounter();
+        const creature = new Creature(encounter, model);
+        creature.hp = 10;
+        creature.turn(true);
+        expect(creature.hp).toEqual(10);
+      });
     });
   });
 });
