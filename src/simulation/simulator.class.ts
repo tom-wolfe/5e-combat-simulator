@@ -1,7 +1,5 @@
-import { CreatureModel, Creature } from '@sim/creature';
+import { Creature, CreatureModel } from '@sim/creature';
 import { DiceRoller, Encounter, EncounterStrategy } from '@sim/encounter';
-import { DefaultDiceRoller } from './default-dice-roller.class';
-import { DefaultEncounterStrategy } from './default-encounter-strategy.class';
 
 export interface SimulationResult {
   battles: number;
@@ -16,12 +14,7 @@ export interface SimulationResult {
 }
 
 export class Simulator {
-  public strategy: EncounterStrategy;
-  public dice: DiceRoller;
-  constructor(strategy?: EncounterStrategy, dice?: DiceRoller) {
-    this.strategy = strategy || new DefaultEncounterStrategy();
-    this.dice = dice || new DefaultDiceRoller();
-  }
+  constructor(public strategy?: EncounterStrategy, public dice?: DiceRoller) { }
 
   simulate(models: CreatureModel[], battles: number): SimulationResult {
     const result: SimulationResult = {

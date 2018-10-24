@@ -1,18 +1,24 @@
-import { Creature, CreatureModel, CreatureType } from '@sim/creature';
+import { Creature, CreatureType } from '@sim/creature';
 import * as _ from 'lodash';
+import { DefaultDiceRoller } from './default-dice-roller.class';
+import { DefaultEncounterStrategy } from './default-encounter-strategy.class';
 import { DiceRoller } from './dice-roller.interface';
 import { EncounterResult } from './encounter-result.interface';
 import { EncounterStrategy } from './encounter-strategy.model';
-import { EncounterTranscript } from './encounter-transcript.interface';
 import { TranscriptLogger } from './transcript-logger.class';
 
 export class Encounter {
+  public strategy: EncounterStrategy;
+  public dice: DiceRoller;
+
   public creatures: Creature[] = [];
   public rounds = 0;
   public transcript: TranscriptLogger;
 
-  constructor(public strategy: EncounterStrategy, public dice: DiceRoller) {
+  constructor(strategy?: EncounterStrategy, dice?: DiceRoller) {
     this.transcript = new TranscriptLogger();
+    this.strategy = strategy || new DefaultEncounterStrategy();
+    this.dice = dice || new DefaultDiceRoller();
   }
 
   get survivors(): Creature[] {
