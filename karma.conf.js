@@ -58,8 +58,4 @@ module.exports = function (config) {
   if (watching) {
     config.karmaTypescriptConfig.coverageOptions.instrumentation = false;
   }
-
-  if (process.env.TRAVIS) {
-    config.browsers = ["chromeTravisCi"];
-  }
 };
